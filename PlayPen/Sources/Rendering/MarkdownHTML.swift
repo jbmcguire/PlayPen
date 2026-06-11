@@ -11,6 +11,8 @@ nonisolated enum MarkdownHTML {
 nonisolated struct HTMLVisitor: MarkupVisitor {
     typealias Result = String
 
+    private var headingIndex = 0
+
     mutating func defaultVisit(_ markup: any Markup) -> String {
         childrenHTML(of: markup)
     }
@@ -24,7 +26,9 @@ nonisolated struct HTMLVisitor: MarkupVisitor {
     }
 
     mutating func visitHeading(_ heading: Heading) -> String {
-        "<h\(heading.level)>\(childrenHTML(of: heading))</h\(heading.level)>\n"
+        let anchorID = "heading-\(headingIndex)"
+        headingIndex += 1
+        return "<h\(heading.level) id=\"\(anchorID)\">\(childrenHTML(of: heading))</h\(heading.level)>\n"
     }
 
     mutating func visitParagraph(_ paragraph: Paragraph) -> String {

@@ -10,6 +10,7 @@
 		0019149301829A7750194C7C /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28C9C0C735D9B6C9F47853E /* SidebarView.swift */; };
 		0FF412B4B601DFE2C86E9A51 /* HTMLPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031B9C089E0B2AEAB82ECFDF /* HTMLPreviewView.swift */; };
 		17347F2A0FA5F5F4B74AF534 /* PlaygroundListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C0D3B0ADF17E6C8543653 /* PlaygroundListView.swift */; };
+		555FC77099E1625ECC08269B /* MarkdownOutline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DB6DF62E42179E9BC0055DA /* MarkdownOutline.swift */; };
 		59ABCC8FE6C78DE169CA9643 /* TagEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF508B6B0FF33077B759BA37 /* TagEditorView.swift */; };
 		71D5FD7BB32BCF7099FA5FAE /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66CC9DC2F21AB34AA9F1AED /* SampleData.swift */; };
 		9FBC2A494A09A6A93236A48E /* MarkdownHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = D210C273C31E3AB5A29A1EA6 /* MarkdownHTML.swift */; };
@@ -25,6 +26,7 @@
 		082C4BBD21B58219BFA43334 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		0E49313C068B1B727AE56EFB /* PlayPen.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PlayPen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B4EBCC757D14A31F5F952BA /* PlayPenApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayPenApp.swift; sourceTree = "<group>"; };
+		7DB6DF62E42179E9BC0055DA /* MarkdownOutline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownOutline.swift; sourceTree = "<group>"; };
 		85C240149A37FBAEB44068AF /* PlaygroundDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaygroundDetailView.swift; sourceTree = "<group>"; };
 		B1E5BD35F0D68F7EFD8B1AF4 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		BE1C0D3B0ADF17E6C8543653 /* PlaygroundListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaygroundListView.swift; sourceTree = "<group>"; };
@@ -79,6 +81,7 @@
 			children = (
 				031B9C089E0B2AEAB82ECFDF /* HTMLPreviewView.swift */,
 				D210C273C31E3AB5A29A1EA6 /* MarkdownHTML.swift */,
+				7DB6DF62E42179E9BC0055DA /* MarkdownOutline.swift */,
 			);
 			path = Rendering;
 			sourceTree = "<group>";
@@ -161,6 +164,7 @@
 				B12B7DE061A42493C1017881 /* ContentView.swift in Sources */,
 				0FF412B4B601DFE2C86E9A51 /* HTMLPreviewView.swift in Sources */,
 				9FBC2A494A09A6A93236A48E /* MarkdownHTML.swift in Sources */,
+				555FC77099E1625ECC08269B /* MarkdownOutline.swift in Sources */,
 				C4B7F874381420B4799CE56B /* Models.swift in Sources */,
 				B0BB132ADDFD62F5D6FB0FF5 /* PlayPenApp.swift in Sources */,
 				EC891D53D290F8CE4DD56D7C /* PlaygroundDetailView.swift in Sources */,

@@ -6,12 +6,14 @@ struct HTMLPreviewView: View {
     let kind: PlaygroundKind
 
     @Environment(\.openURL) private var openURL
+    @Binding var scrollTargetHeadingID: Int?
     @State private var navigationDecider: ExternalLinkNavigationDecider
     @State private var page: WebPage
 
-    init(content: String, kind: PlaygroundKind) {
+    init(content: String, kind: PlaygroundKind, scrollTargetHeadingID: Binding<Int?> = .constant(nil)) {
         self.content = content
         self.kind = kind
+        _scrollTargetHeadingID = scrollTargetHeadingID
         let decider = ExternalLinkNavigationDecider()
         _navigationDecider = State(initialValue: decider)
         _page = State(initialValue: WebPage(navigationDecider: decider))
@@ -25,6 +27,18 @@ struct HTMLPreviewView: View {
             }
             .onChange(of: content) { loadPreview() }
             .onChange(of: kind) { loadPreview() }
+            .onChange(of: scrollTargetHeadingID) { scrollToTargetHeading() }
+    }
+
+    private func scrollToTargetHeading() {
+        guard let headingIndex = scrollTargetHeadingID else { return }
+        scrollTargetHeadingID = nil
+        Task {
+            _ = try? await page.callJavaScript(
+                "document.getElementById(anchorID)?.scrollIntoView({ behavior: 'smooth', block: 'start' })",
+                arguments: ["anchorID": "heading-\(headingIndex)"]
+            )
+        }
     }
 
     private func loadPreview() {
