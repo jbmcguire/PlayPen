@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import MapKit
 
 enum ViewMode: String, CaseIterable, Identifiable {
     case source
@@ -21,6 +22,9 @@ struct PlaygroundDetailView: View {
     @State private var hasOutlineHeadings = false
     @State private var sourceSelection: TextSelection?
     @State private var previewScrollHeadingID: Int?
+    @State private var isAcquiringLocation = false
+    @State private var isShowingLocationError = false
+    @State private var locationErrorMessage = ""
 
     var body: some View {
         VStack(spacing: 0) {
@@ -29,6 +33,10 @@ struct PlaygroundDetailView: View {
                     .font(.largeTitle.weight(.semibold))
                     .textFieldStyle(.plain)
                 TagEditorView(playground: playground)
+                if playground.hasLocation {
+                    PlaygroundLocationCapsule(playground: playground)
+                        .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .leading)))
+                }
             }
             .padding(.horizontal, 24)
             .padding(.top, 16)
@@ -80,6 +88,28 @@ struct PlaygroundDetailView: View {
                     .keyboardShortcut("f", modifiers: .command)
                 }
             }
+            ToolbarItem(placement: .primaryAction) {
+                if isAcquiringLocation {
+                    ProgressView()
+                        .controlSize(.small)
+                        .accessibilityLabel("Acquiring location")
+                } else {
+                    Menu {
+                        Button("Set Current Location", systemImage: "location") {
+                            setCurrentLocation()
+                        }
+                        if playground.hasLocation {
+                            Button("Remove Location", systemImage: "location.slash", role: .destructive) {
+                                removeLocation()
+                            }
+                        }
+                    } label: {
+                        Label("Location", systemImage: playground.hasLocation ? "location.fill" : "location")
+                            .contentTransition(.symbolEffect(.replace))
+                    }
+                    .accessibilityLabel(playground.hasLocation ? "Location, set" : "Location, not set")
+                }
+            }
             ToolbarItem(placement: .secondaryAction) {
                 ProjectAssignmentMenu(playground: playground)
             }
@@ -95,6 +125,39 @@ struct PlaygroundDetailView: View {
         .onChange(of: playground.title) {
             playground.modifiedAt = .now
         }
+        .alert("Couldn't Set Location", isPresented: $isShowingLocationError) {
+        } message: {
+            Text(locationErrorMessage)
+        }
+    }
+
+    private func setCurrentLocation() {
+        guard !isAcquiringLocation else { return }
+        isAcquiringLocation = true
+        Task {
+            defer { isAcquiringLocation = false }
+            do {
+                let locationFix = try await CurrentLocationService.acquireFix()
+                withAnimation(.easeOut(duration: 0.2)) {
+                    playground.latitude = locationFix.latitude
+                    playground.longitude = locationFix.longitude
+                    playground.placeName = locationFix.placeName
+                }
+                playground.modifiedAt = .now
+            } catch {
+                locationErrorMessage = error.localizedDescription
+                isShowingLocationError = true
+            }
+        }
+    }
+
+    private func removeLocation() {
+        withAnimation(.easeOut(duration: 0.2)) {
+            playground.latitude = nil
+            playground.longitude = nil
+            playground.placeName = nil
+        }
+        playground.modifiedAt = .now
     }
 
     private func navigate(to headingItem: HeadingOutlineItem) {
@@ -135,6 +198,43 @@ struct OutlineMenuItems: View {
         let indentation = String(repeating: "\u{2003}", count: max(headingItem.level - 1, 0))
         let displayTitle = headingItem.title.isEmpty ? "Untitled" : headingItem.title
         return indentation + displayTitle
+    }
+}
+
+struct PlaygroundLocationCapsule: View {
+    let playground: Playground
+    @State private var isShowingMapPopover = false
+
+    var body: some View {
+        if let coordinate = playground.coordinate {
+            Button {
+                isShowingMapPopover = true
+            } label: {
+                Label(capsuleTitle, systemImage: "location.fill")
+                    .font(.caption)
+                    .lineLimit(1)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 3)
+                    .background(.tint.opacity(0.15), in: .capsule)
+                    .foregroundStyle(.tint)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Location: \(capsuleTitle)")
+            .popover(isPresented: $isShowingMapPopover) {
+                Map(initialPosition: .region(MKCoordinateRegion(center: coordinate, latitudinalMeters: 1500, longitudinalMeters: 1500))) {
+                    Marker(capsuleTitle, coordinate: coordinate)
+                }
+                .frame(width: 320, height: 240)
+            }
+        }
+    }
+
+    private var capsuleTitle: String {
+        if let placeName = playground.placeName, !placeName.isEmpty {
+            return placeName
+        }
+        guard let latitude = playground.latitude, let longitude = playground.longitude else { return "Location" }
+        return String(format: "%.4f, %.4f", latitude, longitude)
     }
 }
 

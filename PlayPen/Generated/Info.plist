@@ -24,5 +24,7 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string></string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>PlayPen uses your location only when you choose to tag a playground with the place it was written.</string>
 </dict>
 </plist>

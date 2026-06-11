@@ -3,6 +3,7 @@ import SwiftData
 
 enum SidebarSelection: Hashable {
     case all
+    case map
     case project(Project)
     case tag(Tag)
 }
@@ -26,7 +27,9 @@ struct ContentView: View {
             )
             .navigationSplitViewColumnWidth(min: 260, ideal: 300)
         } detail: {
-            if let selectedPlayground {
+            if sidebarSelection == .map, selectedPlayground == nil {
+                PlaygroundMapView(selectedPlayground: $selectedPlayground)
+            } else if let selectedPlayground {
                 PlaygroundDetailView(playground: selectedPlayground)
                     .id(selectedPlayground.persistentModelID)
             } else {
@@ -36,6 +39,10 @@ struct ContentView: View {
                     description: Text("Select a playground from the list, or create a new one.")
                 )
             }
+        }
+        .onChange(of: sidebarSelection) {
+            guard sidebarSelection == .map else { return }
+            selectedPlayground = nil
         }
         .searchable(text: $searchText, tokens: $searchTokens, placement: .sidebar, prompt: "Search playgrounds") { token in
             Label(token.name, systemImage: "tag")

@@ -22,6 +22,7 @@ targets:
         NSHighResolutionCapable: true
         CFBundleDisplayName: PlayPen
         NSHumanReadableCopyright: ""
+        NSLocationWhenInUseUsageDescription: PlayPen uses your location only when you choose to tag a playground with the place it was written.
     settings:
       base:
         CODE_SIGN_IDENTITY: "-"

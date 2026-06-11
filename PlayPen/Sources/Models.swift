@@ -1,3 +1,4 @@
+import CoreLocation
 import Foundation
 import SwiftData
 
@@ -52,6 +53,9 @@ final class Playground {
     var kindRawValue: String = PlaygroundKind.markdown.rawValue
     var createdAt: Date = Date.now
     var modifiedAt: Date = Date.now
+    var latitude: Double?
+    var longitude: Double?
+    var placeName: String?
     var project: Project?
 
     @Relationship(inverse: \Tag.playgrounds)
@@ -69,6 +73,15 @@ final class Playground {
     var kind: PlaygroundKind {
         get { PlaygroundKind(rawValue: kindRawValue) ?? .markdown }
         set { kindRawValue = newValue.rawValue }
+    }
+
+    var hasLocation: Bool {
+        latitude != nil && longitude != nil
+    }
+
+    var coordinate: CLLocationCoordinate2D? {
+        guard let latitude, let longitude else { return nil }
+        return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 
     var snippet: String {

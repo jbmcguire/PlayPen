@@ -22,6 +22,8 @@ struct PlaygroundListView: View {
             switch sidebarSelection {
             case .all:
                 break
+            case .map:
+                guard playground.hasLocation else { return false }
             case .project(let project):
                 guard playground.project == project else { return false }
             case .tag(let tag):
@@ -41,16 +43,7 @@ struct PlaygroundListView: View {
     var body: some View {
         Group {
             if filteredPlaygrounds.isEmpty {
-                ContentUnavailableView {
-                    Label("No Playgrounds", systemImage: "square.dashed")
-                } description: {
-                    Text("Create a playground to start cataloging your experiments.")
-                } actions: {
-                    Button("New Playground", systemImage: "plus") {
-                        createPlayground()
-                    }
-                    .buttonStyle(.glassProminent)
-                }
+                emptyStateView
             } else {
                 List(filteredPlaygrounds, selection: $selectedPlayground) { playground in
                     PlaygroundRow(playground: playground)
@@ -102,9 +95,32 @@ struct PlaygroundListView: View {
         }
     }
 
+    @ViewBuilder
+    private var emptyStateView: some View {
+        if sidebarSelection == .map {
+            ContentUnavailableView {
+                Label("No Geotagged Playgrounds", systemImage: "location.slash")
+            } description: {
+                Text("Tag a playground with your current location from its toolbar to see it here.")
+            }
+        } else {
+            ContentUnavailableView {
+                Label("No Playgrounds", systemImage: "square.dashed")
+            } description: {
+                Text("Create a playground to start cataloging your experiments.")
+            } actions: {
+                Button("New Playground", systemImage: "plus") {
+                    createPlayground()
+                }
+                .buttonStyle(.glassProminent)
+            }
+        }
+    }
+
     private var listTitle: String {
         switch sidebarSelection {
         case .all: "All Playgrounds"
+        case .map: "Geotagged"
         case .project(let project): project.name
         case .tag(let tag): "#\(tag.name)"
         }

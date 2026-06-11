@@ -14,6 +14,9 @@ struct SidebarView: View {
             Label("All Playgrounds", systemImage: "square.stack.3d.up")
                 .tag(SidebarSelection.all)
 
+            Label("Map", systemImage: "map")
+                .tag(SidebarSelection.map)
+
             Section("Projects") {
                 ForEach(projects) { project in
                     Label(project.name, systemImage: "folder")
