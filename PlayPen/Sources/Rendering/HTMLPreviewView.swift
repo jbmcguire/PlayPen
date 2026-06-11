@@ -2,18 +2,43 @@ import SwiftUI
 import WebKit
 
 struct HTMLPreviewView: View {
-    let markdown: String
-    @State private var page = WebPage()
+    let content: String
+    let kind: PlaygroundKind
+
+    @Environment(\.openURL) private var openURL
+    @State private var navigationDecider: ExternalLinkNavigationDecider
+    @State private var page: WebPage
+
+    init(content: String, kind: PlaygroundKind) {
+        self.content = content
+        self.kind = kind
+        let decider = ExternalLinkNavigationDecider()
+        _navigationDecider = State(initialValue: decider)
+        _page = State(initialValue: WebPage(navigationDecider: decider))
+    }
 
     var body: some View {
         WebView(page)
-            .onAppear { loadPreview() }
-            .onChange(of: markdown) { loadPreview() }
+            .onAppear {
+                navigationDecider.openExternalLink = { destinationURL in openURL(destinationURL) }
+                loadPreview()
+            }
+            .onChange(of: content) { loadPreview() }
+            .onChange(of: kind) { loadPreview() }
     }
 
     private func loadPreview() {
-        let renderedBody = MarkdownHTML.render(markdown)
-        page.load(html: Self.documentHTML(body: renderedBody), baseURL: URL(string: "about:blank")!)
+        page.load(html: previewDocumentHTML, baseURL: URL(string: "about:blank")!)
+    }
+
+    private var previewDocumentHTML: String {
+        switch kind {
+        case .markdown:
+            return Self.documentHTML(body: MarkdownHTML.render(content))
+        case .html:
+            let hasDocumentRoot = content.range(of: "<html", options: .caseInsensitive) != nil
+            return hasDocumentRoot ? content : Self.documentHTML(body: content)
+        }
     }
 
     private static func documentHTML(body: String) -> String {
@@ -78,5 +103,17 @@ struct HTMLPreviewView: View {
         <body>\(body)</body>
         </html>
         """
+    }
+}
+
+final class ExternalLinkNavigationDecider: WebPage.NavigationDeciding {
+    var openExternalLink: (URL) -> Void = { _ in }
+
+    func decidePolicy(for action: WebPage.NavigationAction, preferences: inout WebPage.NavigationPreferences) async -> WKNavigationActionPolicy {
+        guard action.navigationType == .linkActivated else { return .allow }
+        guard let destinationURL = action.request.url else { return .cancel }
+        guard destinationURL.scheme != "about" else { return .allow }
+        openExternalLink(destinationURL)
+        return .cancel
     }
 }

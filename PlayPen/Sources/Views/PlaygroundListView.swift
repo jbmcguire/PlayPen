@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UniformTypeIdentifiers
 
 struct PlaygroundListView: View {
     let sidebarSelection: SidebarSelection
@@ -9,6 +10,12 @@ struct PlaygroundListView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Playground.modifiedAt, order: .reverse) private var playgrounds: [Playground]
+    @State private var isShowingFileImporter = false
+    @State private var isShowingImportError = false
+    @State private var importErrorMessage = ""
+
+    private static let htmlFileExtensions: Set<String> = ["html", "htm"]
+    private static let markdownFileExtensions: Set<String> = ["md", "markdown"]
 
     private var filteredPlaygrounds: [Playground] {
         playgrounds.filter { playground in
@@ -66,6 +73,32 @@ struct PlaygroundListView: View {
                 .keyboardShortcut("n", modifiers: .command)
             }
             .visibilityPriority(.high)
+            ToolbarItem(placement: .secondaryAction) {
+                Button("Import Files", systemImage: "square.and.arrow.down") {
+                    isShowingFileImporter = true
+                }
+                .keyboardShortcut("i", modifiers: [.command, .shift])
+            }
+            .visibilityPriority(.low)
+        }
+        .fileImporter(
+            isPresented: $isShowingFileImporter,
+            allowedContentTypes: [.html, .markdown],
+            allowsMultipleSelection: true
+        ) { pickerResult in
+            switch pickerResult {
+            case .success(let pickedURLs):
+                importPlaygrounds(from: pickedURLs)
+            case .failure(let pickerError):
+                presentImportError(pickerError.localizedDescription)
+            }
+        }
+        .dropDestination(for: URL.self) { droppedURLs, _ in
+            handleDroppedFileURLs(droppedURLs)
+        }
+        .alert("Import Failed", isPresented: $isShowingImportError) {
+        } message: {
+            Text(importErrorMessage)
         }
     }
 
@@ -95,6 +128,60 @@ struct PlaygroundListView: View {
         }
         modelContext.delete(playground)
     }
+
+    private func handleDroppedFileURLs(_ droppedURLs: [URL]) {
+        let supportedFileExtensions = Self.htmlFileExtensions.union(Self.markdownFileExtensions)
+        let importableURLs = droppedURLs.filter { supportedFileExtensions.contains($0.pathExtension.lowercased()) }
+        guard !importableURLs.isEmpty else {
+            presentImportError("Only Markdown and HTML files can be imported.")
+            return
+        }
+        importPlaygrounds(from: importableURLs)
+    }
+
+    private func importPlaygrounds(from fileURLs: [URL]) {
+        var unreadableFileNames: [String] = []
+        var lastImportedPlayground: Playground?
+        for fileURL in fileURLs {
+            guard let importedPlayground = importPlayground(at: fileURL) else {
+                unreadableFileNames.append(fileURL.lastPathComponent)
+                continue
+            }
+            lastImportedPlayground = importedPlayground
+        }
+        if let lastImportedPlayground {
+            selectedPlayground = lastImportedPlayground
+        }
+        guard !unreadableFileNames.isEmpty else { return }
+        presentImportError("Could not read \(unreadableFileNames.formatted(.list(type: .and))).")
+    }
+
+    private func importPlayground(at fileURL: URL) -> Playground? {
+        let hasSecurityScope = fileURL.startAccessingSecurityScopedResource()
+        defer {
+            if hasSecurityScope { fileURL.stopAccessingSecurityScopedResource() }
+        }
+        guard let fileContent = try? String(contentsOf: fileURL, encoding: .utf8) else { return nil }
+        let importedKind: PlaygroundKind = Self.htmlFileExtensions.contains(fileURL.pathExtension.lowercased()) ? .html : .markdown
+        let playground = Playground(
+            title: fileURL.deletingPathExtension().lastPathComponent,
+            content: fileContent,
+            kind: importedKind
+        )
+        if case .project(let project) = sidebarSelection {
+            playground.project = project
+        }
+        if case .tag(let tag) = sidebarSelection {
+            playground.tags = [tag]
+        }
+        modelContext.insert(playground)
+        return playground
+    }
+
+    private func presentImportError(_ message: String) {
+        importErrorMessage = message
+        isShowingImportError = true
+    }
 }
 
 struct PlaygroundRow: View {
@@ -110,6 +197,10 @@ struct PlaygroundRow: View {
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
             HStack(spacing: 6) {
+                Image(systemName: playground.kind.symbolName)
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .accessibilityLabel(playground.kind.displayName)
                 if let project = playground.project {
                     Label(project.name, systemImage: "folder")
                         .font(.caption)

@@ -26,10 +26,30 @@ final class Tag {
     }
 }
 
+enum PlaygroundKind: String, Codable, CaseIterable {
+    case markdown
+    case html
+
+    var displayName: String {
+        switch self {
+        case .markdown: "Markdown"
+        case .html: "HTML"
+        }
+    }
+
+    var symbolName: String {
+        switch self {
+        case .markdown: "text.document"
+        case .html: "chevron.left.forwardslash.chevron.right"
+        }
+    }
+}
+
 @Model
 final class Playground {
     var title: String = ""
     var content: String = ""
+    var kindRawValue: String = PlaygroundKind.markdown.rawValue
     var createdAt: Date = Date.now
     var modifiedAt: Date = Date.now
     var project: Project?
@@ -37,12 +57,18 @@ final class Playground {
     @Relationship(inverse: \Tag.playgrounds)
     var tags: [Tag] = []
 
-    init(title: String, content: String = "", project: Project? = nil) {
+    init(title: String, content: String = "", kind: PlaygroundKind = .markdown, project: Project? = nil) {
         self.title = title
         self.content = content
+        self.kindRawValue = kind.rawValue
         self.createdAt = .now
         self.modifiedAt = .now
         self.project = project
+    }
+
+    var kind: PlaygroundKind {
+        get { PlaygroundKind(rawValue: kindRawValue) ?? .markdown }
+        set { kindRawValue = newValue.rawValue }
     }
 
     var snippet: String {

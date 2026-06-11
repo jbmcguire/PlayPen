@@ -2,9 +2,16 @@ import SwiftUI
 import SwiftData
 
 enum ViewMode: String, CaseIterable, Identifiable {
-    case markdown = "Markdown"
-    case preview = "Preview"
+    case source
+    case preview
     var id: String { rawValue }
+
+    func title(for kind: PlaygroundKind) -> String {
+        switch self {
+        case .source: kind == .html ? "Source" : "Markdown"
+        case .preview: "Preview"
+        }
+    }
 }
 
 struct PlaygroundDetailView: View {
@@ -26,14 +33,14 @@ struct PlaygroundDetailView: View {
             Divider()
 
             switch viewMode {
-            case .markdown:
+            case .source:
                 TextEditor(text: $playground.content)
                     .font(.system(.body, design: .monospaced))
                     .scrollContentBackground(.hidden)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
             case .preview:
-                HTMLPreviewView(markdown: playground.content)
+                HTMLPreviewView(content: playground.content, kind: playground.kind)
             }
         }
         .scrollEdgeEffectStyle(.soft, for: .top)
@@ -42,7 +49,7 @@ struct PlaygroundDetailView: View {
             ToolbarItem(placement: .principal) {
                 Picker("View Mode", selection: $viewMode) {
                     ForEach(ViewMode.allCases) { mode in
-                        Text(mode.rawValue).tag(mode)
+                        Text(mode.title(for: playground.kind)).tag(mode)
                     }
                 }
                 .pickerStyle(.segmented)
