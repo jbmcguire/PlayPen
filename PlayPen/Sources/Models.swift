@@ -9,7 +9,7 @@ final class Project {
     var sortIndex: Int = 0
 
     @Relationship(deleteRule: .cascade, inverse: \Playground.project)
-    var playgrounds: [Playground] = []
+    var playgrounds: [Playground]? = []
 
     init(name: String) {
         self.name = name
@@ -20,7 +20,7 @@ final class Project {
 @Model
 final class Tag {
     var name: String = ""
-    var playgrounds: [Playground] = []
+    var playgrounds: [Playground]? = []
 
     init(name: String) {
         self.name = name
@@ -59,7 +59,7 @@ final class Playground {
     var project: Project?
 
     @Relationship(inverse: \Tag.playgrounds)
-    var tags: [Tag] = []
+    var tags: [Tag]? = []
 
     init(title: String, content: String = "", kind: PlaygroundKind = .markdown, project: Project? = nil) {
         self.title = title
@@ -103,12 +103,14 @@ extension Tag {
                 canonicalTagsByName[tag.name] = tag
                 continue
             }
-            let affectedPlaygrounds = Array(tag.playgrounds)
+            let affectedPlaygrounds = tag.playgrounds ?? []
             for playground in affectedPlaygrounds {
-                if !playground.tags.contains(canonicalTag) {
-                    playground.tags.append(canonicalTag)
+                var reassignedTags = playground.tags ?? []
+                if !reassignedTags.contains(canonicalTag) {
+                    reassignedTags.append(canonicalTag)
                 }
-                playground.tags.removeAll { $0 == tag }
+                reassignedTags.removeAll { $0 == tag }
+                playground.tags = reassignedTags
             }
             context.delete(tag)
         }

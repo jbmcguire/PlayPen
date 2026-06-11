@@ -26,6 +26,15 @@ struct PlaygroundDetailView: View {
     @State private var isShowingLocationError = false
     @State private var locationErrorMessage = ""
 
+    init(playground: Playground) {
+        self.playground = playground
+        _hasOutlineHeadings = State(initialValue: !MarkdownOutline.headings(in: playground.content).isEmpty)
+    }
+
+    private var hasPreviewableContent: Bool {
+        !playground.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 10) {
@@ -53,11 +62,24 @@ struct PlaygroundDetailView: View {
                     .padding(.vertical, 8)
                     .findNavigator(isPresented: $isFindNavigatorPresented)
             case .preview:
-                HTMLPreviewView(
-                    content: playground.content,
-                    kind: playground.kind,
-                    scrollTargetHeadingID: $previewScrollHeadingID
-                )
+                if hasPreviewableContent {
+                    HTMLPreviewView(
+                        content: playground.content,
+                        kind: playground.kind,
+                        scrollTargetHeadingID: $previewScrollHeadingID
+                    )
+                } else {
+                    ContentUnavailableView {
+                        Label("Nothing to Preview", systemImage: "square.dashed")
+                    } description: {
+                        Text("This playground is empty. Switch to \(ViewMode.source.title(for: playground.kind)) to start writing.")
+                    } actions: {
+                        Button("Edit \(ViewMode.source.title(for: playground.kind))") {
+                            viewMode = .source
+                        }
+                        .buttonStyle(.glassProminent)
+                    }
+                }
             }
         }
         .scrollEdgeEffectStyle(.soft, for: .top)
@@ -138,6 +160,7 @@ struct PlaygroundDetailView: View {
             defer { isAcquiringLocation = false }
             do {
                 let locationFix = try await CurrentLocationService.acquireFix()
+                guard !playground.isDeleted, playground.modelContext != nil else { return }
                 withAnimation(.easeOut(duration: 0.2)) {
                     playground.latitude = locationFix.latitude
                     playground.longitude = locationFix.longitude
@@ -216,7 +239,9 @@ struct PlaygroundLocationCapsule: View {
                     .padding(.horizontal, 9)
                     .padding(.vertical, 3)
                     .background(.tint.opacity(0.15), in: .capsule)
-                    .foregroundStyle(.tint)
+                    .foregroundStyle(Color.accentColor.mix(with: .primary, by: 0.4))
+                    .frame(minWidth: 44, minHeight: 44, alignment: .leading)
+                    .contentShape(.rect)
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Location: \(capsuleTitle)")
@@ -225,6 +250,7 @@ struct PlaygroundLocationCapsule: View {
                     Marker(capsuleTitle, coordinate: coordinate)
                 }
                 .frame(width: 320, height: 240)
+                .presentationCompactAdaptation(.popover)
             }
         }
     }

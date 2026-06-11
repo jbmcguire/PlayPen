@@ -35,6 +35,10 @@ Schema changes now, while the dataset is small.
 - [x] `Models.swift`: removed `@Attribute(.unique)` from `Tag.name`; every
   persisted property on `Project`/`Tag`/`Playground` now has a default value
   or is optional, as CloudKit requires.
+- [x] `Models.swift`: all relationships are optional (`Project.playgrounds`,
+  `Tag.playgrounds`, `Playground.tags` are `[...]? = []`; `Playground.project`
+  was already `Project?`) — CloudKit rejects non-optional relationships at
+  container creation, so call sites nil-coalesce instead.
 - [x] Tag uniqueness is app logic: `TagEditorView.addTag()` normalizes
   (trim + lowercase) and fetch-or-creates — the single runtime `Tag` creation
   site (SampleData seeds already-normalized names once into an empty store).
@@ -62,7 +66,13 @@ Schema changes now, while the dataset is small.
        com.apple.developer.icloud-container-identifiers:
          - iCloud.com.boltsystem.PlayPen
        aps-environment: development
+       com.apple.developer.aps-environment: development
    ```
+
+   (`aps-environment` is the iOS push entitlement key;
+   `com.apple.developer.aps-environment` is the macOS one. The single shared
+   entitlements file needs both, or the Mac app never receives CloudKit
+   remote-change pushes and degrades to launch/foreground polling.)
 
    and under `info.properties` (iOS picks it up; macOS ignores it):
 

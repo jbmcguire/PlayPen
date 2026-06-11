@@ -8,7 +8,7 @@ struct TagEditorView: View {
     @State private var newTagName = ""
 
     private var sortedTags: [Tag] {
-        playground.tags.sorted { $0.name < $1.name }
+        (playground.tags ?? []).sorted { $0.name < $1.name }
     }
 
     var body: some View {
@@ -47,19 +47,22 @@ struct TagEditorView: View {
             .lowercased()
         newTagName = ""
         guard !normalizedName.isEmpty else { return }
-        guard !playground.tags.contains(where: { $0.name == normalizedName }) else { return }
+        let currentTags = playground.tags ?? []
+        guard !currentTags.contains(where: { $0.name == normalizedName }) else { return }
 
         if let existingTag = allTags.first(where: { $0.name == normalizedName }) {
-            playground.tags.append(existingTag)
+            playground.tags = currentTags + [existingTag]
             return
         }
         let tag = Tag(name: normalizedName)
         modelContext.insert(tag)
-        playground.tags.append(tag)
+        playground.tags = currentTags + [tag]
     }
 
     private func removeTag(_ tag: Tag) {
-        playground.tags.removeAll { $0 == tag }
+        var remainingTags = playground.tags ?? []
+        remainingTags.removeAll { $0 == tag }
+        playground.tags = remainingTags
     }
 }
 

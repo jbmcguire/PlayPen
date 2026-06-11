@@ -9,6 +9,8 @@ struct HTMLPreviewView: View {
     @Binding var scrollTargetHeadingID: Int?
     @State private var navigationDecider: ExternalLinkNavigationDecider
     @State private var page: WebPage
+    @State private var loadFailureMessage: String?
+    @State private var loadObservationTask: Task<Void, Never>?
 
     init(content: String, kind: PlaygroundKind, scrollTargetHeadingID: Binding<Int?> = .constant(nil)) {
         self.content = content
@@ -21,13 +23,33 @@ struct HTMLPreviewView: View {
 
     var body: some View {
         WebView(page)
+            .overlay {
+                if let loadFailureMessage {
+                    loadFailureView(message: loadFailureMessage)
+                }
+            }
             .onAppear {
                 navigationDecider.openExternalLink = { destinationURL in openURL(destinationURL) }
                 loadPreview()
             }
+            .onDisappear { loadObservationTask?.cancel() }
             .onChange(of: content) { loadPreview() }
             .onChange(of: kind) { loadPreview() }
             .onChange(of: scrollTargetHeadingID) { scrollToTargetHeading() }
+    }
+
+    private func loadFailureView(message: String) -> some View {
+        ContentUnavailableView {
+            Label("Preview Failed to Load", systemImage: "exclamationmark.triangle")
+        } description: {
+            Text(message)
+        } actions: {
+            Button("Reload") {
+                loadPreview()
+            }
+            .buttonStyle(.glassProminent)
+        }
+        .background(.background)
     }
 
     private func scrollToTargetHeading() {
@@ -42,7 +64,17 @@ struct HTMLPreviewView: View {
     }
 
     private func loadPreview() {
-        page.load(html: previewDocumentHTML, baseURL: URL(string: "about:blank")!)
+        loadObservationTask?.cancel()
+        loadFailureMessage = nil
+        let navigationEvents = page.load(html: previewDocumentHTML, baseURL: URL(string: "about:blank")!)
+        loadObservationTask = Task {
+            do {
+                for try await _ in navigationEvents {}
+            } catch {
+                guard !Task.isCancelled else { return }
+                loadFailureMessage = error.localizedDescription
+            }
+        }
     }
 
     private var previewDocumentHTML: String {
@@ -124,10 +156,11 @@ final class ExternalLinkNavigationDecider: WebPage.NavigationDeciding {
     var openExternalLink: (URL) -> Void = { _ in }
 
     func decidePolicy(for action: WebPage.NavigationAction, preferences: inout WebPage.NavigationPreferences) async -> WKNavigationActionPolicy {
-        guard action.navigationType == .linkActivated else { return .allow }
         guard let destinationURL = action.request.url else { return .cancel }
         guard destinationURL.scheme != "about" else { return .allow }
-        openExternalLink(destinationURL)
+        if action.navigationType == .linkActivated {
+            openExternalLink(destinationURL)
+        }
         return .cancel
     }
 }

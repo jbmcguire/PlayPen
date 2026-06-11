@@ -21,7 +21,7 @@ struct SidebarView: View {
                 ForEach(projects) { project in
                     Label(project.name, systemImage: "folder")
                         .tag(SidebarSelection.project(project))
-                        .badge(project.playgrounds.count)
+                        .badge(project.playgrounds?.count ?? 0)
                         .contextMenu {
                             Button("Delete Project", systemImage: "trash", role: .destructive) {
                                 deleteProject(project)
@@ -36,7 +36,7 @@ struct SidebarView: View {
                 ForEach(tags) { tag in
                     Label(tag.name, systemImage: "tag")
                         .tag(SidebarSelection.tag(tag))
-                        .badge(tag.playgrounds.count)
+                        .badge(tag.playgrounds?.count ?? 0)
                         .contextMenu {
                             Button("Delete Tag", systemImage: "trash", role: .destructive) {
                                 deleteTag(tag)

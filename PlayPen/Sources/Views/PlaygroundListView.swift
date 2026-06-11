@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import CoreTransferable
 import UniformTypeIdentifiers
 
 struct PlaygroundListView: View {
@@ -19,6 +20,7 @@ struct PlaygroundListView: View {
 
     private var filteredPlaygrounds: [Playground] {
         playgrounds.filter { playground in
+            let playgroundTags = playground.tags ?? []
             switch sidebarSelection {
             case .all:
                 break
@@ -27,9 +29,9 @@ struct PlaygroundListView: View {
             case .project(let project):
                 guard playground.project == project else { return false }
             case .tag(let tag):
-                guard playground.tags.contains(tag) else { return false }
+                guard playgroundTags.contains(tag) else { return false }
             }
-            for token in searchTokens where !playground.tags.contains(token) {
+            for token in searchTokens where !playgroundTags.contains(token) {
                 return false
             }
             if !searchText.isEmpty {
@@ -86,8 +88,8 @@ struct PlaygroundListView: View {
                 presentImportError(pickerError.localizedDescription)
             }
         }
-        .dropDestination(for: URL.self) { droppedURLs, _ in
-            handleDroppedFileURLs(droppedURLs)
+        .dropDestination(for: ImportedPlaygroundFile.self) { droppedFiles, _ in
+            importPlaygrounds(droppedFiles)
         }
         .alert("Import Failed", isPresented: $isShowingImportError) {
         } message: {
@@ -128,14 +130,18 @@ struct PlaygroundListView: View {
 
     private func createPlayground() {
         let playground = Playground(title: "Untitled Playground", content: "# Untitled Playground\n\n")
+        applyListContext(to: playground)
+        modelContext.insert(playground)
+        selectedPlayground = playground
+    }
+
+    private func applyListContext(to playground: Playground) {
         if case .project(let project) = sidebarSelection {
             playground.project = project
         }
         if case .tag(let tag) = sidebarSelection {
             playground.tags = [tag]
         }
-        modelContext.insert(playground)
-        selectedPlayground = playground
     }
 
     private func deletePlayground(_ playground: Playground) {
@@ -145,14 +151,20 @@ struct PlaygroundListView: View {
         modelContext.delete(playground)
     }
 
-    private func handleDroppedFileURLs(_ droppedURLs: [URL]) {
-        let supportedFileExtensions = Self.htmlFileExtensions.union(Self.markdownFileExtensions)
-        let importableURLs = droppedURLs.filter { supportedFileExtensions.contains($0.pathExtension.lowercased()) }
-        guard !importableURLs.isEmpty else {
-            presentImportError("Only Markdown and HTML files can be imported.")
-            return
+    private func importPlaygrounds(_ importedFiles: [ImportedPlaygroundFile]) {
+        guard !importedFiles.isEmpty else { return }
+        var lastImportedPlayground: Playground?
+        for importedFile in importedFiles {
+            let playground = Playground(
+                title: importedFile.title,
+                content: importedFile.content,
+                kind: importedFile.kind
+            )
+            applyListContext(to: playground)
+            modelContext.insert(playground)
+            lastImportedPlayground = playground
         }
-        importPlaygrounds(from: importableURLs)
+        selectedPlayground = lastImportedPlayground
     }
 
     private func importPlaygrounds(from fileURLs: [URL]) {
@@ -184,12 +196,7 @@ struct PlaygroundListView: View {
             content: fileContent,
             kind: importedKind
         )
-        if case .project(let project) = sidebarSelection {
-            playground.project = project
-        }
-        if case .tag(let tag) = sidebarSelection {
-            playground.tags = [tag]
-        }
+        applyListContext(to: playground)
         modelContext.insert(playground)
         return playground
     }
@@ -200,8 +207,33 @@ struct PlaygroundListView: View {
     }
 }
 
+nonisolated struct ImportedPlaygroundFile: Transferable {
+    let title: String
+    let content: String
+    let kind: PlaygroundKind
+
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(importedContentType: .markdown) { receivedFile in
+            try Self(fileURL: receivedFile.file, kind: .markdown)
+        }
+        FileRepresentation(importedContentType: .html) { receivedFile in
+            try Self(fileURL: receivedFile.file, kind: .html)
+        }
+    }
+
+    init(fileURL: URL, kind: PlaygroundKind) throws {
+        title = fileURL.deletingPathExtension().lastPathComponent
+        content = try String(contentsOf: fileURL, encoding: .utf8)
+        self.kind = kind
+    }
+}
+
 struct PlaygroundRow: View {
     let playground: Playground
+
+    private var displayTags: [Tag] {
+        Array((playground.tags ?? []).sorted { $0.name < $1.name }.prefix(4))
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -228,9 +260,9 @@ struct PlaygroundRow: View {
                     .font(.caption)
                     .foregroundStyle(.tertiary)
             }
-            if !playground.tags.isEmpty {
+            if !displayTags.isEmpty {
                 HStack(spacing: 4) {
-                    ForEach(playground.tags.sorted { $0.name < $1.name }.prefix(4)) { tag in
+                    ForEach(displayTags) { tag in
                         TagCapsule(name: tag.name)
                     }
                 }

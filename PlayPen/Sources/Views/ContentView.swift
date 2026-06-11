@@ -32,6 +32,15 @@ struct ContentView: View {
             } else if let selectedPlayground {
                 PlaygroundDetailView(playground: selectedPlayground)
                     .id(selectedPlayground.persistentModelID)
+                    .toolbar {
+                        if sidebarSelection == .map {
+                            ToolbarItem(placement: .navigation) {
+                                Button("Back to Map", systemImage: "map") {
+                                    self.selectedPlayground = nil
+                                }
+                            }
+                        }
+                    }
             } else {
                 ContentUnavailableView(
                     "No Playground Selected",
