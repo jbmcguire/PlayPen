@@ -1,0 +1,19 @@
+name: SPMApp
+options:
+  bundleIdPrefix: com.example
+targets:
+  SPMApp:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources: [Sources/SPMApp]
+    info:
+      path: Generated-Info.plist
+      properties:
+        NSPrincipalClass: NSApplication
+        NSHighResolutionCapable: true
+    settings:
+      base:
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        ENABLE_HARDENED_RUNTIME: false

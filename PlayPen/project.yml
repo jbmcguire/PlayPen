@@ -1,0 +1,32 @@
+name: PlayPen
+options:
+  bundleIdPrefix: com.boltsystem
+packages:
+  Markdown:
+    url: https://github.com/swiftlang/swift-markdown
+    from: 0.4.0
+targets:
+  PlayPen:
+    type: application
+    platform: macOS
+    deploymentTarget: "27.0"
+    sources: [Sources]
+    dependencies:
+      - package: Markdown
+        product: Markdown
+    info:
+      path: Generated/Info.plist
+      properties:
+        NSPrincipalClass: NSApplication
+        NSHighResolutionCapable: true
+        CFBundleDisplayName: PlayPen
+        NSHumanReadableCopyright: ""
+    settings:
+      base:
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        ENABLE_HARDENED_RUNTIME: false
+        SWIFT_VERSION: "6.0"
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+        MACOSX_DEPLOYMENT_TARGET: "27.0"

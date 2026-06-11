@@ -1,0 +1,381 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0019149301829A7750194C7C /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28C9C0C735D9B6C9F47853E /* SidebarView.swift */; };
+		0FF412B4B601DFE2C86E9A51 /* HTMLPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031B9C089E0B2AEAB82ECFDF /* HTMLPreviewView.swift */; };
+		17347F2A0FA5F5F4B74AF534 /* PlaygroundListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C0D3B0ADF17E6C8543653 /* PlaygroundListView.swift */; };
+		59ABCC8FE6C78DE169CA9643 /* TagEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF508B6B0FF33077B759BA37 /* TagEditorView.swift */; };
+		71D5FD7BB32BCF7099FA5FAE /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66CC9DC2F21AB34AA9F1AED /* SampleData.swift */; };
+		9FBC2A494A09A6A93236A48E /* MarkdownHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = D210C273C31E3AB5A29A1EA6 /* MarkdownHTML.swift */; };
+		B0BB132ADDFD62F5D6FB0FF5 /* PlayPenApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4EBCC757D14A31F5F952BA /* PlayPenApp.swift */; };
+		B12B7DE061A42493C1017881 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 082C4BBD21B58219BFA43334 /* ContentView.swift */; };
+		BBCDCD9A833A829F2B2C9737 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = BFCD199D95FEA8293A12FCBA /* Markdown */; };
+		C4B7F874381420B4799CE56B /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E5BD35F0D68F7EFD8B1AF4 /* Models.swift */; };
+		EC891D53D290F8CE4DD56D7C /* PlaygroundDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C240149A37FBAEB44068AF /* PlaygroundDetailView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		031B9C089E0B2AEAB82ECFDF /* HTMLPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLPreviewView.swift; sourceTree = "<group>"; };
+		082C4BBD21B58219BFA43334 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		0E49313C068B1B727AE56EFB /* PlayPen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlayPen.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2B4EBCC757D14A31F5F952BA /* PlayPenApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayPenApp.swift; sourceTree = "<group>"; };
+		85C240149A37FBAEB44068AF /* PlaygroundDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaygroundDetailView.swift; sourceTree = "<group>"; };
+		B1E5BD35F0D68F7EFD8B1AF4 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		BE1C0D3B0ADF17E6C8543653 /* PlaygroundListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaygroundListView.swift; sourceTree = "<group>"; };
+		D210C273C31E3AB5A29A1EA6 /* MarkdownHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownHTML.swift; sourceTree = "<group>"; };
+		D28C9C0C735D9B6C9F47853E /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
+		D66CC9DC2F21AB34AA9F1AED /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
+		FF508B6B0FF33077B759BA37 /* TagEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagEditorView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FADD66D0EE25983FE3096EBA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBCDCD9A833A829F2B2C9737 /* Markdown in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		38E2E4C634748D5F467CDFAD = {
+			isa = PBXGroup;
+			children = (
+				DED64A37E367080C9479AD75 /* Sources */,
+				8D20F638129DE4E2FD4139CE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4F1708C27959C665EAEE4BB3 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				082C4BBD21B58219BFA43334 /* ContentView.swift */,
+				85C240149A37FBAEB44068AF /* PlaygroundDetailView.swift */,
+				BE1C0D3B0ADF17E6C8543653 /* PlaygroundListView.swift */,
+				D28C9C0C735D9B6C9F47853E /* SidebarView.swift */,
+				FF508B6B0FF33077B759BA37 /* TagEditorView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		8D20F638129DE4E2FD4139CE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0E49313C068B1B727AE56EFB /* PlayPen.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AFABB4B78B21FE770D858077 /* Rendering */ = {
+			isa = PBXGroup;
+			children = (
+				031B9C089E0B2AEAB82ECFDF /* HTMLPreviewView.swift */,
+				D210C273C31E3AB5A29A1EA6 /* MarkdownHTML.swift */,
+			);
+			path = Rendering;
+			sourceTree = "<group>";
+		};
+		DED64A37E367080C9479AD75 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				B1E5BD35F0D68F7EFD8B1AF4 /* Models.swift */,
+				2B4EBCC757D14A31F5F952BA /* PlayPenApp.swift */,
+				D66CC9DC2F21AB34AA9F1AED /* SampleData.swift */,
+				AFABB4B78B21FE770D858077 /* Rendering */,
+				4F1708C27959C665EAEE4BB3 /* Views */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5FB9CFEEAC6FF098B2BF8675 /* PlayPen */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7F70116E1A5F41708E34B83F /* Build configuration list for PBXNativeTarget "PlayPen" */;
+			buildPhases = (
+				E44358AA58FAF84A41C22533 /* Sources */,
+				FADD66D0EE25983FE3096EBA /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PlayPen;
+			packageProductDependencies = (
+				BFCD199D95FEA8293A12FCBA /* Markdown */,
+			);
+			productName = PlayPen;
+			productReference = 0E49313C068B1B727AE56EFB /* PlayPen.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E2CD9D8A53D26049124552EB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					5FB9CFEEAC6FF098B2BF8675 = {
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = 338C81D63421F4EF13092140 /* Build configuration list for PBXProject "PlayPen" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 38E2E4C634748D5F467CDFAD;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				7E6363FE2FA19A8357FB4553 /* XCRemoteSwiftPackageReference "swift-markdown" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 8D20F638129DE4E2FD4139CE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5FB9CFEEAC6FF098B2BF8675 /* PlayPen */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E44358AA58FAF84A41C22533 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B12B7DE061A42493C1017881 /* ContentView.swift in Sources */,
+				0FF412B4B601DFE2C86E9A51 /* HTMLPreviewView.swift in Sources */,
+				9FBC2A494A09A6A93236A48E /* MarkdownHTML.swift in Sources */,
+				C4B7F874381420B4799CE56B /* Models.swift in Sources */,
+				B0BB132ADDFD62F5D6FB0FF5 /* PlayPenApp.swift in Sources */,
+				EC891D53D290F8CE4DD56D7C /* PlaygroundDetailView.swift in Sources */,
+				17347F2A0FA5F5F4B74AF534 /* PlaygroundListView.swift in Sources */,
+				71D5FD7BB32BCF7099FA5FAE /* SampleData.swift in Sources */,
+				0019149301829A7750194C7C /* SidebarView.swift in Sources */,
+				59ABCC8FE6C78DE169CA9643 /* TagEditorView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		38FE6466E9229ED06D061599 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		B278558E8C51E613D9A59951 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = Generated/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.boltsystem.PlayPen;
+				SDKROOT = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		CC699A62BEA1F1E6DB37E832 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E64CBC52D35B6B2A7B63968C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				INFOPLIST_FILE = Generated/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.boltsystem.PlayPen;
+				SDKROOT = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		338C81D63421F4EF13092140 /* Build configuration list for PBXProject "PlayPen" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CC699A62BEA1F1E6DB37E832 /* Debug */,
+				38FE6466E9229ED06D061599 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7F70116E1A5F41708E34B83F /* Build configuration list for PBXNativeTarget "PlayPen" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B278558E8C51E613D9A59951 /* Debug */,
+				E64CBC52D35B6B2A7B63968C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7E6363FE2FA19A8357FB4553 /* XCRemoteSwiftPackageReference "swift-markdown" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/swiftlang/swift-markdown";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BFCD199D95FEA8293A12FCBA /* Markdown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7E6363FE2FA19A8357FB4553 /* XCRemoteSwiftPackageReference "swift-markdown" */;
+			productName = Markdown;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = E2CD9D8A53D26049124552EB /* Project object */;
+}
