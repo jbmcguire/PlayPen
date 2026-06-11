@@ -2,9 +2,16 @@ import Foundation
 import SwiftData
 
 enum SampleData {
+    private static let hasSeededKey = "SampleData.hasSeeded"
+
     static func seedIfNeeded(context: ModelContext) {
+        guard !UserDefaults.standard.bool(forKey: hasSeededKey) else { return }
+
         let existingCount = (try? context.fetchCount(FetchDescriptor<Playground>())) ?? 0
-        guard existingCount == 0 else { return }
+        guard existingCount == 0 else {
+            UserDefaults.standard.set(true, forKey: hasSeededKey)
+            return
+        }
 
         let swiftUIProject = Project(name: "SwiftUI Experiments")
         let apiProject = Project(name: "API Spikes")
@@ -90,5 +97,6 @@ enum SampleData {
 
         [glassPlayground, flowPlayground, retryPlayground].forEach { context.insert($0) }
         try? context.save()
+        UserDefaults.standard.set(true, forKey: hasSeededKey)
     }
 }

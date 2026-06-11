@@ -11,6 +11,7 @@ struct PlayPenApp: App {
         } catch {
             fatalError("Failed to create model container: \(error)")
         }
+        Tag.deduplicate(in: container.mainContext)
         SampleData.seedIfNeeded(context: container.mainContext)
     }
 

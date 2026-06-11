@@ -30,15 +30,53 @@ First, because all later features should be built/tested on both platforms.
 
 Schema changes now, while the dataset is small.
 
-- `Models.swift`: remove `@Attribute(.unique)` from `Tag.name` (CloudKit doesn't
-  support unique constraints) — replace with fetch-or-create when tagging.
-  Every property needs a default value or to be optional.
-- Entitlements via project.yml: iCloud container + CloudKit, push notifications,
-  remote-notification background mode on iOS.
-- `PlayPenApp.swift`: `ModelConfiguration(cloudKitDatabase: .automatic)`.
-- Guard `SampleData.seedIfNeeded` against double-seeding when a second device syncs.
-- Test with two simulators/devices on one iCloud account + CloudKit Console.
-  Requires paid developer account.
+### Done (schema is CloudKit-compatible; sync NOT yet enabled)
+
+- [x] `Models.swift`: removed `@Attribute(.unique)` from `Tag.name`; every
+  persisted property on `Project`/`Tag`/`Playground` now has a default value
+  or is optional, as CloudKit requires.
+- [x] Tag uniqueness is app logic: `TagEditorView.addTag()` normalizes
+  (trim + lowercase) and fetch-or-creates — the single runtime `Tag` creation
+  site (SampleData seeds already-normalized names once into an empty store).
+- [x] Launch-time dedupe: `Tag.deduplicate(in:)` (Models.swift) merges Tags
+  with identical names — repoints playgrounds to one canonical Tag, deletes
+  extras — run in `PlayPenApp.init` right after container creation, before
+  seeding. Idempotent, so future CloudKit merge conflicts self-heal on launch.
+- [x] `SampleData.seedIfNeeded` is double-seed-proof: empty-store check plus a
+  `UserDefaults` "SampleData.hasSeeded" flag (also set when a non-empty store
+  is found, e.g. after a fresh device syncs down an existing library).
+
+### Remaining — exact flip-on steps (requires real development team + paid account)
+
+1. project.yml: replace the ad-hoc signing settings (`CODE_SIGN_IDENTITY: "-"`,
+   `CODE_SIGN_STYLE: Manual`) with `CODE_SIGN_STYLE: Automatic` and
+   `DEVELOPMENT_TEAM: <TEAMID>`.
+2. project.yml: add the entitlements block below to the `PlayPen` target plus
+   the iOS background mode, then run `xcodegen`:
+
+   ```yaml
+   entitlements:
+     path: Generated/PlayPen.entitlements
+     properties:
+       com.apple.developer.icloud-services: [CloudKit]
+       com.apple.developer.icloud-container-identifiers:
+         - iCloud.com.boltsystem.PlayPen
+       aps-environment: development
+   ```
+
+   and under `info.properties` (iOS picks it up; macOS ignores it):
+
+   ```yaml
+   UIBackgroundModes: [remote-notification]
+   ```
+
+3. `PlayPenApp.swift`: build the container with an explicit configuration:
+   `ModelConfiguration(cloudKitDatabase: .automatic)` passed to
+   `ModelContainer(for:configurations:)`.
+4. CloudKit Console: deploy the development schema to production
+   (CloudKit Console → iCloud.com.boltsystem.PlayPen → Deploy Schema Changes)
+   before shipping; development devices auto-create the schema on first sync.
+5. Test with two simulators/devices signed into one iCloud account.
 
 ## Phase 3 — HTML file viewing
 
