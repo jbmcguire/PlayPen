@@ -24,7 +24,5 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string></string>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
 </dict>
 </plist>
