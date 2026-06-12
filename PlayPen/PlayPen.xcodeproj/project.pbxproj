@@ -10,11 +10,13 @@
 		0019149301829A7750194C7C /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28C9C0C735D9B6C9F47853E /* SidebarView.swift */; };
 		0FF412B4B601DFE2C86E9A51 /* HTMLPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031B9C089E0B2AEAB82ECFDF /* HTMLPreviewView.swift */; };
 		17347F2A0FA5F5F4B74AF534 /* PlaygroundListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1C0D3B0ADF17E6C8543653 /* PlaygroundListView.swift */; };
-		2E7E9EB9DC8DCA6A73BF5517 /* PlaygroundMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA2470208D91D0CE80F2F778 /* PlaygroundMapView.swift */; };
+		36A3CD7BAB76A97603A56D8A /* HostedServiceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA270B139337355691691871 /* HostedServiceSettingsView.swift */; };
 		555FC77099E1625ECC08269B /* MarkdownOutline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DB6DF62E42179E9BC0055DA /* MarkdownOutline.swift */; };
 		59ABCC8FE6C78DE169CA9643 /* TagEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF508B6B0FF33077B759BA37 /* TagEditorView.swift */; };
+		6BE386D555AE6555D78EC127 /* HostedPlaygroundService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7BECC8E68A19A3028225E1A /* HostedPlaygroundService.swift */; };
 		71D5FD7BB32BCF7099FA5FAE /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66CC9DC2F21AB34AA9F1AED /* SampleData.swift */; };
-		85C51D96B55B5442EAC29BB8 /* CurrentLocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B2BDCF8C907757FA155EC1E /* CurrentLocationService.swift */; };
+		82FBDEA59EC05353D14B6DB7 /* HostedLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C06319C7DC7FABDEF0ECE3E /* HostedLibraryView.swift */; };
+		88DEA6DE1EED4BB70BED1C8C /* Hosted in Resources */ = {isa = PBXBuildFile; fileRef = 3E016A1AF90F325C7E743FA7 /* Hosted */; };
 		9FBC2A494A09A6A93236A48E /* MarkdownHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = D210C273C31E3AB5A29A1EA6 /* MarkdownHTML.swift */; };
 		B0BB132ADDFD62F5D6FB0FF5 /* PlayPenApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4EBCC757D14A31F5F952BA /* PlayPenApp.swift */; };
 		B12B7DE061A42493C1017881 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 082C4BBD21B58219BFA43334 /* ContentView.swift */; };
@@ -26,17 +28,19 @@
 /* Begin PBXFileReference section */
 		031B9C089E0B2AEAB82ECFDF /* HTMLPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLPreviewView.swift; sourceTree = "<group>"; };
 		082C4BBD21B58219BFA43334 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		0C06319C7DC7FABDEF0ECE3E /* HostedLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostedLibraryView.swift; sourceTree = "<group>"; };
 		0E49313C068B1B727AE56EFB /* PlayPen.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PlayPen.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		1B2BDCF8C907757FA155EC1E /* CurrentLocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentLocationService.swift; sourceTree = "<group>"; };
 		2B4EBCC757D14A31F5F952BA /* PlayPenApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayPenApp.swift; sourceTree = "<group>"; };
+		3E016A1AF90F325C7E743FA7 /* Hosted */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Hosted; sourceTree = SOURCE_ROOT; };
 		7DB6DF62E42179E9BC0055DA /* MarkdownOutline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownOutline.swift; sourceTree = "<group>"; };
 		85C240149A37FBAEB44068AF /* PlaygroundDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaygroundDetailView.swift; sourceTree = "<group>"; };
 		B1E5BD35F0D68F7EFD8B1AF4 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
-		BA2470208D91D0CE80F2F778 /* PlaygroundMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaygroundMapView.swift; sourceTree = "<group>"; };
+		BA270B139337355691691871 /* HostedServiceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostedServiceSettingsView.swift; sourceTree = "<group>"; };
 		BE1C0D3B0ADF17E6C8543653 /* PlaygroundListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaygroundListView.swift; sourceTree = "<group>"; };
 		D210C273C31E3AB5A29A1EA6 /* MarkdownHTML.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownHTML.swift; sourceTree = "<group>"; };
 		D28C9C0C735D9B6C9F47853E /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		D66CC9DC2F21AB34AA9F1AED /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
+		E7BECC8E68A19A3028225E1A /* HostedPlaygroundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostedPlaygroundService.swift; sourceTree = "<group>"; };
 		FF508B6B0FF33077B759BA37 /* TagEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagEditorView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -52,9 +56,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0D8B8482D19711C7BBA1AFA9 /* Hosting */ = {
+			isa = PBXGroup;
+			children = (
+				E7BECC8E68A19A3028225E1A /* HostedPlaygroundService.swift */,
+			);
+			path = Hosting;
+			sourceTree = "<group>";
+		};
 		38E2E4C634748D5F467CDFAD = {
 			isa = PBXGroup;
 			children = (
+				3E016A1AF90F325C7E743FA7 /* Hosted */,
 				DED64A37E367080C9479AD75 /* Sources */,
 				8D20F638129DE4E2FD4139CE /* Products */,
 			);
@@ -64,9 +77,10 @@
 			isa = PBXGroup;
 			children = (
 				082C4BBD21B58219BFA43334 /* ContentView.swift */,
+				0C06319C7DC7FABDEF0ECE3E /* HostedLibraryView.swift */,
+				BA270B139337355691691871 /* HostedServiceSettingsView.swift */,
 				85C240149A37FBAEB44068AF /* PlaygroundDetailView.swift */,
 				BE1C0D3B0ADF17E6C8543653 /* PlaygroundListView.swift */,
-				BA2470208D91D0CE80F2F778 /* PlaygroundMapView.swift */,
 				D28C9C0C735D9B6C9F47853E /* SidebarView.swift */,
 				FF508B6B0FF33077B759BA37 /* TagEditorView.swift */,
 			);
@@ -97,19 +111,11 @@
 				B1E5BD35F0D68F7EFD8B1AF4 /* Models.swift */,
 				2B4EBCC757D14A31F5F952BA /* PlayPenApp.swift */,
 				D66CC9DC2F21AB34AA9F1AED /* SampleData.swift */,
-				F436CD8876822B5FB0158648 /* Location */,
+				0D8B8482D19711C7BBA1AFA9 /* Hosting */,
 				AFABB4B78B21FE770D858077 /* Rendering */,
 				4F1708C27959C665EAEE4BB3 /* Views */,
 			);
 			path = Sources;
-			sourceTree = "<group>";
-		};
-		F436CD8876822B5FB0158648 /* Location */ = {
-			isa = PBXGroup;
-			children = (
-				1B2BDCF8C907757FA155EC1E /* CurrentLocationService.swift */,
-			);
-			path = Location;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -120,6 +126,7 @@
 			buildConfigurationList = 7F70116E1A5F41708E34B83F /* Build configuration list for PBXNativeTarget "PlayPen" */;
 			buildPhases = (
 				E44358AA58FAF84A41C22533 /* Sources */,
+				FE70A83880F5801187A601C4 /* Resources */,
 				FADD66D0EE25983FE3096EBA /* Frameworks */,
 			);
 			buildRules = (
@@ -170,21 +177,33 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		FE70A83880F5801187A601C4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				88DEA6DE1EED4BB70BED1C8C /* Hosted in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		E44358AA58FAF84A41C22533 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				B12B7DE061A42493C1017881 /* ContentView.swift in Sources */,
-				85C51D96B55B5442EAC29BB8 /* CurrentLocationService.swift in Sources */,
 				0FF412B4B601DFE2C86E9A51 /* HTMLPreviewView.swift in Sources */,
+				82FBDEA59EC05353D14B6DB7 /* HostedLibraryView.swift in Sources */,
+				6BE386D555AE6555D78EC127 /* HostedPlaygroundService.swift in Sources */,
+				36A3CD7BAB76A97603A56D8A /* HostedServiceSettingsView.swift in Sources */,
 				9FBC2A494A09A6A93236A48E /* MarkdownHTML.swift in Sources */,
 				555FC77099E1625ECC08269B /* MarkdownOutline.swift in Sources */,
 				C4B7F874381420B4799CE56B /* Models.swift in Sources */,
 				B0BB132ADDFD62F5D6FB0FF5 /* PlayPenApp.swift in Sources */,
 				EC891D53D290F8CE4DD56D7C /* PlaygroundDetailView.swift in Sources */,
 				17347F2A0FA5F5F4B74AF534 /* PlaygroundListView.swift in Sources */,
-				2E7E9EB9DC8DCA6A73BF5517 /* PlaygroundMapView.swift in Sources */,
 				71D5FD7BB32BCF7099FA5FAE /* SampleData.swift in Sources */,
 				0019149301829A7750194C7C /* SidebarView.swift in Sources */,
 				59ABCC8FE6C78DE169CA9643 /* TagEditorView.swift in Sources */,
@@ -267,6 +286,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				PLAYPEN_HOSTED_SERVICE_URL = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.boltsystem.PlayPen;
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
@@ -360,6 +380,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				PLAYPEN_HOSTED_SERVICE_URL = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.boltsystem.PlayPen;
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";

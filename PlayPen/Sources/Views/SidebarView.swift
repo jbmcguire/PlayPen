@@ -3,19 +3,19 @@ import SwiftData
 
 struct SidebarView: View {
     @Binding var selection: SidebarSelection?
+    @Binding var selectedPlayground: Playground?
     @Environment(\.modelContext) private var modelContext
     @Query(sort: [SortDescriptor(\Project.sortIndex), SortDescriptor(\Project.name)]) private var projects: [Project]
     @Query(sort: \Tag.name) private var tags: [Tag]
     @State private var isAddingProject = false
+    @State private var isShowingHostedLibrary = false
+    @State private var isShowingHostedServiceSettings = false
     @State private var newProjectName = ""
 
     var body: some View {
         List(selection: $selection) {
             Label("All Playgrounds", systemImage: "square.stack.3d.up")
                 .tag(SidebarSelection.all)
-
-            Label("Map", systemImage: "map")
-                .tag(SidebarSelection.map)
 
             Section("Projects") {
                 ForEach(projects) { project in
@@ -48,8 +48,16 @@ struct SidebarView: View {
         .navigationTitle("PlayPen")
         .toolbar {
             ToolbarItem {
-                Button("New Project", systemImage: "folder.badge.plus") {
-                    isAddingProject = true
+                Menu("Library Actions", systemImage: "ellipsis.circle") {
+                    Button("New Project", systemImage: "folder.badge.plus") {
+                        isAddingProject = true
+                    }
+                    Button("Hosted Service", systemImage: "network") {
+                        isShowingHostedServiceSettings = true
+                    }
+                    Button("Hosted Library", systemImage: "tray.full") {
+                        isShowingHostedLibrary = true
+                    }
                 }
             }
         }
@@ -57,6 +65,12 @@ struct SidebarView: View {
             TextField("Project name", text: $newProjectName)
             Button("Create") { createProject() }
             Button("Cancel", role: .cancel) { newProjectName = "" }
+        }
+        .sheet(isPresented: $isShowingHostedServiceSettings) {
+            HostedServiceSettingsView()
+        }
+        .sheet(isPresented: $isShowingHostedLibrary) {
+            HostedLibraryView(selectedPlayground: $selectedPlayground, sidebarSelection: $selection)
         }
     }
 

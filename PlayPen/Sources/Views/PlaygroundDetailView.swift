@@ -1,6 +1,10 @@
 import SwiftUI
 import SwiftData
-import MapKit
+#if os(macOS)
+import AppKit
+#else
+import UIKit
+#endif
 
 enum ViewMode: String, CaseIterable, Identifiable {
     case source
@@ -22,9 +26,11 @@ struct PlaygroundDetailView: View {
     @State private var hasOutlineHeadings = false
     @State private var sourceSelection: TextSelection?
     @State private var previewScrollHeadingID: Int?
-    @State private var isAcquiringLocation = false
-    @State private var isShowingLocationError = false
-    @State private var locationErrorMessage = ""
+    @State private var isShowingHostedMirrorMessage = false
+    @State private var hostedMirrorMessage = ""
+    @State private var isPublishingHostedMirror = false
+    @State private var isRefreshingHostedMirror = false
+    @Environment(\.openURL) private var openURL
 
     init(playground: Playground) {
         self.playground = playground
@@ -42,9 +48,9 @@ struct PlaygroundDetailView: View {
                     .font(.largeTitle.weight(.semibold))
                     .textFieldStyle(.plain)
                 TagEditorView(playground: playground)
-                if playground.hasLocation {
-                    PlaygroundLocationCapsule(playground: playground)
-                        .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .leading)))
+                AnnotationEditor(playground: playground)
+                if playground.hasHostedMirror {
+                    HostedMirrorStatus(playground: playground)
                 }
             }
             .padding(.horizontal, 24)
@@ -111,25 +117,39 @@ struct PlaygroundDetailView: View {
                 }
             }
             ToolbarItem(placement: .primaryAction) {
-                if isAcquiringLocation {
+                if isPublishingHostedMirror || isRefreshingHostedMirror {
                     ProgressView()
                         .controlSize(.small)
-                        .accessibilityLabel("Acquiring location")
+                        .accessibilityLabel(isPublishingHostedMirror ? "Publishing hosted mirror" : "Refreshing hosted mirror")
                 } else {
-                    Menu {
-                        Button("Set Current Location", systemImage: "location") {
-                            setCurrentLocation()
+                    Menu("Hosted Mirror", systemImage: playground.hasHostedMirror ? "link.circle.fill" : "link.circle") {
+                        Button("Publish and Copy Link", systemImage: "doc.on.doc") {
+                            publishHostedMirror(copyLink: true, openLink: false)
                         }
-                        if playground.hasLocation {
-                            Button("Remove Location", systemImage: "location.slash", role: .destructive) {
-                                removeLocation()
+                        Button("Publish and Open Link", systemImage: "safari") {
+                            publishHostedMirror(copyLink: false, openLink: true)
+                        }
+                        if let hostedURL = playground.hostedURL {
+                            Divider()
+                            Button("Pull Latest from Host", systemImage: "arrow.down.doc") {
+                                refreshFromHostedMirror(hostedURL)
+                            }
+                            if let manifestURL = HostedPlaygroundService.manifestURL(for: playground) {
+                                Button("Copy Manifest Link", systemImage: "doc.on.doc.fill") {
+                                    copyManifestLink(manifestURL)
+                                }
+                                Button("Open Manifest", systemImage: "curlybraces") {
+                                    openURL(manifestURL)
+                                }
+                            }
+                            ShareLink(item: hostedURL) {
+                                Label("Share Published Link", systemImage: "square.and.arrow.up")
                             }
                         }
-                    } label: {
-                        Label("Location", systemImage: playground.hasLocation ? "location.fill" : "location")
-                            .contentTransition(.symbolEffect(.replace))
+                        if playground.hasHostedMirror {
+                            Text(playground.isHostedMirrorCurrent ? "Published snapshot is current" : "Local edits need publishing")
+                        }
                     }
-                    .accessibilityLabel(playground.hasLocation ? "Location, set" : "Location, not set")
                 }
             }
             ToolbarItem(placement: .secondaryAction) {
@@ -147,40 +167,95 @@ struct PlaygroundDetailView: View {
         .onChange(of: playground.title) {
             playground.modifiedAt = .now
         }
-        .alert("Couldn't Set Location", isPresented: $isShowingLocationError) {
+        .onChange(of: playground.annotation) {
+            playground.modifiedAt = .now
+        }
+        .alert("Hosted Mirror", isPresented: $isShowingHostedMirrorMessage) {
         } message: {
-            Text(locationErrorMessage)
+            Text(hostedMirrorMessage)
         }
     }
 
-    private func setCurrentLocation() {
-        guard !isAcquiringLocation else { return }
-        isAcquiringLocation = true
+    private func publishHostedMirror(copyLink: Bool, openLink: Bool) {
+        guard !isPublishingHostedMirror else { return }
+        guard !isRefreshingHostedMirror else { return }
+        isPublishingHostedMirror = true
         Task {
-            defer { isAcquiringLocation = false }
+            defer { isPublishingHostedMirror = false }
             do {
-                let locationFix = try await CurrentLocationService.acquireFix()
+                let publishResult = try await HostedPlaygroundService.publish(playground)
                 guard !playground.isDeleted, playground.modelContext != nil else { return }
-                withAnimation(.easeOut(duration: 0.2)) {
-                    playground.latitude = locationFix.latitude
-                    playground.longitude = locationFix.longitude
-                    playground.placeName = locationFix.placeName
-                }
+                playground.hostedID = publishResult.id
+                playground.hostedPublishedAt = publishResult.publishedAt
+                playground.hostedContentDigest = publishResult.contentDigest
+                playground.hostedURL = publishResult.url
+                playground.annotation = publishResult.annotation ?? ""
                 playground.modifiedAt = .now
+                if copyLink {
+                    copyToClipboard(publishResult.url.absoluteString)
+                    hostedMirrorMessage = message(for: publishResult)
+                    isShowingHostedMirrorMessage = true
+                }
+                if openLink {
+                    openURL(publishResult.url)
+                }
             } catch {
-                locationErrorMessage = error.localizedDescription
-                isShowingLocationError = true
+                hostedMirrorMessage = error.localizedDescription
+                isShowingHostedMirrorMessage = true
             }
         }
     }
 
-    private func removeLocation() {
-        withAnimation(.easeOut(duration: 0.2)) {
-            playground.latitude = nil
-            playground.longitude = nil
-            playground.placeName = nil
+    private func refreshFromHostedMirror(_ hostedURL: URL) {
+        guard !isRefreshingHostedMirror else { return }
+        guard !isPublishingHostedMirror else { return }
+        isRefreshingHostedMirror = true
+        Task {
+            defer { isRefreshingHostedMirror = false }
+            do {
+                let payload = try await HostedPlaygroundService.resolve(hostedURL)
+                guard !playground.isDeleted, playground.modelContext != nil else { return }
+                playground.title = payload.title.isEmpty ? "Untitled Playground" : payload.title
+                playground.annotation = payload.annotation ?? ""
+                playground.content = payload.content
+                playground.kind = payload.kind
+                playground.hostedID = payload.id
+                playground.hostedURL = HostedPlaygroundService.canonicalHostedURL(for: hostedURL, payload: payload)
+                playground.hostedPublishedAt = payload.publishedAt
+                playground.hostedContentDigest = HostedPlaygroundService.contentDigest(for: payload)
+                playground.modifiedAt = .now
+                hostedMirrorMessage = "Pulled the latest hosted source into this playground."
+                isShowingHostedMirrorMessage = true
+            } catch {
+                hostedMirrorMessage = error.localizedDescription
+                isShowingHostedMirrorMessage = true
+            }
         }
-        playground.modifiedAt = .now
+    }
+
+    private func copyManifestLink(_ manifestURL: URL) {
+        copyToClipboard(manifestURL.absoluteString)
+        hostedMirrorMessage = "Manifest link copied. Share it with agents for metadata, source, deep links, and digest-pinned inspect commands."
+        isShowingHostedMirrorMessage = true
+    }
+
+    private func message(for publishResult: HostedPublishResult) -> String {
+        if publishResult.didUseHostedAPI {
+            return "Hosted link copied. Service: \(HostedPlaygroundService.serviceName)."
+        }
+        if let fallbackReason = publishResult.fallbackReason {
+            return "Encoded mirror link copied because the hosted API was unavailable: \(fallbackReason)"
+        }
+        return "Encoded mirror link copied. Configure a hosted service URL to publish short links."
+    }
+
+    private func copyToClipboard(_ text: String) {
+        #if os(macOS)
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        #else
+        UIPasteboard.general.string = text
+        #endif
     }
 
     private func navigate(to headingItem: HeadingOutlineItem) {
@@ -197,6 +272,52 @@ struct PlaygroundDetailView: View {
         guard lineNumber >= 1, lineNumber <= contentLines.count else { return }
         let headingLine = contentLines[lineNumber - 1]
         sourceSelection = TextSelection(range: headingLine.startIndex..<headingLine.endIndex)
+    }
+}
+
+struct HostedMirrorStatus: View {
+    let playground: Playground
+
+    var body: some View {
+        Label {
+            Text(statusText)
+                .lineLimit(1)
+        } icon: {
+            Image(systemName: playground.isHostedMirrorCurrent ? "checkmark.circle" : "arrow.triangle.2.circlepath")
+        }
+        .font(.caption)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 3)
+        .background(statusColor.opacity(0.14), in: .capsule)
+        .foregroundStyle(statusColor)
+        .frame(minWidth: 44, minHeight: 44, alignment: .leading)
+        .accessibilityLabel(statusText)
+    }
+
+    private var statusText: String {
+        if playground.isHostedMirrorCurrent {
+            return "Hosted mirror current"
+        }
+        return "Hosted mirror needs publishing"
+    }
+
+    private var statusColor: Color {
+        playground.isHostedMirrorCurrent ? .green : .orange
+    }
+}
+
+struct AnnotationEditor: View {
+    @Bindable var playground: Playground
+
+    var body: some View {
+        TextField("Annotation", text: $playground.annotation, axis: .vertical)
+            .font(.callout)
+            .textFieldStyle(.plain)
+            .lineLimit(1...3)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background(.secondary.opacity(0.08), in: .rect(cornerRadius: 8))
+            .accessibilityLabel("Annotation")
     }
 }
 
@@ -221,46 +342,6 @@ struct OutlineMenuItems: View {
         let indentation = String(repeating: "\u{2003}", count: max(headingItem.level - 1, 0))
         let displayTitle = headingItem.title.isEmpty ? "Untitled" : headingItem.title
         return indentation + displayTitle
-    }
-}
-
-struct PlaygroundLocationCapsule: View {
-    let playground: Playground
-    @State private var isShowingMapPopover = false
-
-    var body: some View {
-        if let coordinate = playground.coordinate {
-            Button {
-                isShowingMapPopover = true
-            } label: {
-                Label(capsuleTitle, systemImage: "location.fill")
-                    .font(.caption)
-                    .lineLimit(1)
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 3)
-                    .background(.tint.opacity(0.15), in: .capsule)
-                    .foregroundStyle(Color.accentColor.mix(with: .primary, by: 0.4))
-                    .frame(minWidth: 44, minHeight: 44, alignment: .leading)
-                    .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Location: \(capsuleTitle)")
-            .popover(isPresented: $isShowingMapPopover) {
-                Map(initialPosition: .region(MKCoordinateRegion(center: coordinate, latitudinalMeters: 1500, longitudinalMeters: 1500))) {
-                    Marker(capsuleTitle, coordinate: coordinate)
-                }
-                .frame(width: 320, height: 240)
-                .presentationCompactAdaptation(.popover)
-            }
-        }
-    }
-
-    private var capsuleTitle: String {
-        if let placeName = playground.placeName, !placeName.isEmpty {
-            return placeName
-        }
-        guard let latitude = playground.latitude, let longitude = playground.longitude else { return "Location" }
-        return String(format: "%.4f, %.4f", latitude, longitude)
     }
 }
 

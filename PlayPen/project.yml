@@ -12,7 +12,11 @@ targets:
     deploymentTarget:
       iOS: "27.0"
       macOS: "27.0"
-    sources: [Sources]
+    sources:
+      - path: Sources
+      - path: Hosted
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: Markdown
         product: Markdown
@@ -22,12 +26,17 @@ targets:
         NSHighResolutionCapable: true
         CFBundleDisplayName: PlayPen
         NSHumanReadableCopyright: ""
-        NSLocationWhenInUseUsageDescription: PlayPen uses your location only when you choose to tag a playground with the place it was written.
+        PlayPenHostedServiceURL: $(PLAYPEN_HOSTED_SERVICE_URL)
+        CFBundleURLTypes:
+          - CFBundleURLName: com.boltsystem.PlayPen
+            CFBundleURLSchemes:
+              - playpen
     settings:
       base:
         CODE_SIGN_IDENTITY: "-"
         CODE_SIGN_STYLE: Manual
         ENABLE_HARDENED_RUNTIME: false
+        PLAYPEN_HOSTED_SERVICE_URL: ""
         SWIFT_VERSION: "6.0"
         SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
         SWIFT_APPROACHABLE_CONCURRENCY: YES

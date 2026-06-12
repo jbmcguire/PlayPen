@@ -1,0 +1,20 @@
+{
+  "name": "playpen-hosted-mirror",
+  "private": true,
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "publish": "node publish-file.js",
+    "inspect": "node inspect-link.js",
+    "doctor": "node env-doctor.js",
+    "demo": "node demo-local.js",
+    "verify": "node verify-host.js",
+    "preflight": "node production-preflight.js",
+    "smoke": "node smoke-local.js",
+    "check": "node --check app.js && node --check demo-local.js && node --check env-doctor.js && node --check inspect-link.js && node --check publish-file.js && node --check production-preflight.js && node --check server.js && node --check smoke-local.js && node --check storage.js && node --check verify-host.js && node --check tests/app-runtime.test.js && node --check tests/env-doctor.test.js && node --check tests/examples.test.js && node --check tests/hosted-service.test.js && node --check tests/production-preflight.test.js && node --check tests/storage.test.js && node -e \"JSON.parse(require('fs').readFileSync('openapi.json','utf8'))\"",
+    "test": "node tests/storage.test.js && node tests/env-doctor.test.js && node tests/examples.test.js && node tests/app-runtime.test.js && node tests/hosted-service.test.js && node tests/production-preflight.test.js"
+  }
+}

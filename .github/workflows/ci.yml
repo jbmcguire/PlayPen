@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  # The native app currently requires Xcode beta SDKs for macOS/iOS/iPadOS 27,
+  # so hosted-service CI runs here and native build verification is documented
+  # in README.md and CONTRIBUTING.md for local Xcode environments.
+  hosted-service:
+    name: Hosted service
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: PlayPen/Hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Check hosted service
+        run: npm run check
+
+      - name: Check hosted environment defaults
+        run: npm run doctor
+
+      - name: Test hosted service
+        run: npm test
+
+      - name: Smoke hosted service
+        run: npm run smoke
+
+      - name: Demo hosted artifact workflow
+        run: npm run demo

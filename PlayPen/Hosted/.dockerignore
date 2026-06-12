@@ -1,0 +1,6 @@
+.env
+.env.*
+.playpen-store/
+node_modules/
+npm-debug.log
+npm-debug.log*

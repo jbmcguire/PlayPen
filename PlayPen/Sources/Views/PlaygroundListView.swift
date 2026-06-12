@@ -13,7 +13,10 @@ struct PlaygroundListView: View {
     @Query(sort: \Playground.modifiedAt, order: .reverse) private var playgrounds: [Playground]
     @State private var isShowingFileImporter = false
     @State private var isShowingImportError = false
+    @State private var isShowingHostedImport = false
+    @State private var isImportingHostedMirror = false
     @State private var importErrorMessage = ""
+    @State private var hostedImportURLString = ""
 
     private static let htmlFileExtensions: Set<String> = ["html", "htm"]
     private static let markdownFileExtensions: Set<String> = ["md", "markdown"]
@@ -24,8 +27,6 @@ struct PlaygroundListView: View {
             switch sidebarSelection {
             case .all:
                 break
-            case .map:
-                guard playground.hasLocation else { return false }
             case .project(let project):
                 guard playground.project == project else { return false }
             case .tag(let tag):
@@ -75,6 +76,18 @@ struct PlaygroundListView: View {
                 .keyboardShortcut("i", modifiers: [.command, .shift])
             }
             .visibilityPriority(.low)
+            ToolbarItem(placement: .secondaryAction) {
+                if isImportingHostedMirror {
+                    ProgressView()
+                        .controlSize(.small)
+                        .accessibilityLabel("Importing hosted mirror")
+                } else {
+                    Button("Import Hosted Link", systemImage: "link.badge.plus") {
+                        isShowingHostedImport = true
+                    }
+                }
+            }
+            .visibilityPriority(.low)
         }
         .fileImporter(
             isPresented: $isShowingFileImporter,
@@ -95,34 +108,36 @@ struct PlaygroundListView: View {
         } message: {
             Text(importErrorMessage)
         }
+        .alert("Import Hosted Link", isPresented: $isShowingHostedImport) {
+            TextField("https://...", text: $hostedImportURLString)
+            Button("Import") {
+                importHostedMirror()
+            }
+            Button("Cancel", role: .cancel) {
+                hostedImportURLString = ""
+            }
+        } message: {
+            Text("Paste a PlayPen mirror link.")
+        }
     }
 
     @ViewBuilder
     private var emptyStateView: some View {
-        if sidebarSelection == .map {
-            ContentUnavailableView {
-                Label("No Geotagged Playgrounds", systemImage: "location.slash")
-            } description: {
-                Text("Tag a playground with your current location from its toolbar to see it here.")
+        ContentUnavailableView {
+            Label("No Playgrounds", systemImage: "square.dashed")
+        } description: {
+            Text("Create a playground to start cataloging your experiments.")
+        } actions: {
+            Button("New Playground", systemImage: "plus") {
+                createPlayground()
             }
-        } else {
-            ContentUnavailableView {
-                Label("No Playgrounds", systemImage: "square.dashed")
-            } description: {
-                Text("Create a playground to start cataloging your experiments.")
-            } actions: {
-                Button("New Playground", systemImage: "plus") {
-                    createPlayground()
-                }
-                .buttonStyle(.glassProminent)
-            }
+            .buttonStyle(.glassProminent)
         }
     }
 
     private var listTitle: String {
         switch sidebarSelection {
         case .all: "All Playgrounds"
-        case .map: "Geotagged"
         case .project(let project): project.name
         case .tag(let tag): "#\(tag.name)"
         }
@@ -182,6 +197,39 @@ struct PlaygroundListView: View {
         }
         guard !unreadableFileNames.isEmpty else { return }
         presentImportError("Could not read \(unreadableFileNames.formatted(.list(type: .and))).")
+    }
+
+    private func importHostedMirror() {
+        let trimmedURLString = hostedImportURLString.trimmingCharacters(in: .whitespacesAndNewlines)
+        hostedImportURLString = ""
+        guard let hostedURL = URL(string: trimmedURLString) else {
+            presentImportError("Enter a valid PlayPen mirror link.")
+            return
+        }
+        guard !isImportingHostedMirror else { return }
+        isImportingHostedMirror = true
+        Task {
+            defer { isImportingHostedMirror = false }
+            do {
+                let payload = try await HostedPlaygroundService.resolve(hostedURL)
+                let playground = Playground(
+                    title: payload.title.isEmpty ? "Untitled Playground" : payload.title,
+                    content: payload.content,
+                    kind: payload.kind
+                )
+                playground.annotation = payload.annotation ?? ""
+                playground.hostedID = payload.id
+                playground.hostedURL = HostedPlaygroundService.canonicalHostedURL(for: hostedURL, payload: payload)
+                playground.hostedPublishedAt = payload.publishedAt
+                playground.hostedContentDigest = HostedPlaygroundService.contentDigest(for: payload)
+                playground.modifiedAt = .now
+                applyListContext(to: playground)
+                modelContext.insert(playground)
+                selectedPlayground = playground
+            } catch {
+                presentImportError(error.localizedDescription)
+            }
+        }
     }
 
     private func importPlayground(at fileURL: URL) -> Playground? {
@@ -244,6 +292,12 @@ struct PlaygroundRow: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
+            if playground.hasAnnotation {
+                Label(playground.annotation, systemImage: "note.text")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
             HStack(spacing: 6) {
                 Image(systemName: playground.kind.symbolName)
                     .font(.caption)

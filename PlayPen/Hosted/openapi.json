@@ -1,0 +1,1128 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PlayPen Hosted Mirror API",
+    "version": "0.1.0",
+    "description": "Host PlayPen HTML and Markdown playgrounds as shareable browser links."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Check service health",
+        "responses": {
+          "200": {
+            "description": "Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/stats": {
+      "get": {
+        "summary": "Read content-free host totals",
+        "responses": {
+          "200": {
+            "description": "Host totals without record content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stats"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/capabilities": {
+      "get": {
+        "summary": "Discover PlayPen host capabilities",
+        "responses": {
+          "200": {
+            "description": "Host capabilities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Capabilities"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/.well-known/playpen-host.json": {
+      "get": {
+        "summary": "Discover PlayPen host capabilities from a well-known URL",
+        "responses": {
+          "200": {
+            "description": "Host capabilities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Capabilities"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "summary": "Read the OpenAPI contract",
+        "responses": {
+          "200": {
+            "description": "OpenAPI document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/.well-known/openapi.json": {
+      "get": {
+        "summary": "Read the OpenAPI contract from a well-known URL",
+        "responses": {
+          "200": {
+            "description": "OpenAPI document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/playgrounds": {
+      "get": {
+        "summary": "List hosted playground metadata",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Hosted playground metadata list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaygroundList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Publish a playground",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Optional record id for raw text/html or text/markdown publishes.",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{8,80}$"
+            }
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "description": "Optional title for raw text/html or text/markdown publishes.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "annotation",
+            "in": "query",
+            "description": "Optional annotation for raw publishes.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "description": "Optional kind override for raw text/plain publishes.",
+            "schema": {
+              "type": "string",
+              "enum": ["markdown", "html"]
+            }
+          }
+        ],
+        "security": [
+          {},
+          {
+            "bearerAuth": []
+          },
+          {
+            "publishTokenHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlaygroundPayload"
+              }
+            },
+            "text/html": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "text/markdown": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Published playground link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      }
+    },
+    "/api/playgrounds/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/PlaygroundID"
+        }
+      ],
+      "put": {
+        "summary": "Replace a hosted playground record",
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "description": "Optional title for raw text/html or text/markdown replacements.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "annotation",
+            "in": "query",
+            "description": "Optional annotation for raw replacements.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "description": "Optional kind override for raw text/plain replacements.",
+            "schema": {
+              "type": "string",
+              "enum": ["markdown", "html"]
+            }
+          }
+        ],
+        "security": [
+          {},
+          {
+            "bearerAuth": []
+          },
+          {
+            "publishTokenHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlaygroundPayload"
+              }
+            },
+            "text/html": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "text/markdown": {
+              "schema": {
+                "type": "string"
+              }
+            },
+            "text/plain": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Replaced playground link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "get": {
+        "summary": "Read a playground record",
+        "responses": {
+          "200": {
+            "description": "Playground payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaygroundPayload"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "head": {
+        "summary": "Check whether a playground record exists",
+        "responses": {
+          "200": {
+            "description": "Record exists"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a playground record",
+        "security": [
+          {},
+          {
+            "bearerAuth": []
+          },
+          {
+            "publishTokenHeader": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted playground record",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/playgrounds/{id}/meta": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/PlaygroundID"
+        }
+      ],
+      "get": {
+        "summary": "Read playground metadata",
+        "responses": {
+          "200": {
+            "description": "Playground metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaygroundMetadata"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "head": {
+        "summary": "Check whether playground metadata exists",
+        "responses": {
+          "200": {
+            "description": "Metadata exists"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/playgrounds/{id}/manifest": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/PlaygroundID"
+        }
+      ],
+      "get": {
+        "summary": "Read an agent handoff manifest",
+        "responses": {
+          "200": {
+            "description": "PlayPen artifact manifest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArtifactManifest"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "head": {
+        "summary": "Check whether the artifact manifest exists",
+        "responses": {
+          "200": {
+            "description": "Manifest exists"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/playgrounds/{id}/source": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/PlaygroundID"
+        }
+      ],
+      "get": {
+        "summary": "Read raw source as non-executable text",
+        "responses": {
+          "200": {
+            "description": "Raw playground source",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "head": {
+        "summary": "Check whether raw source exists",
+        "responses": {
+          "200": {
+            "description": "Source exists"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/playgrounds/{id}/render": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/PlaygroundID"
+        }
+      ],
+      "get": {
+        "summary": "Render HTML playground content in a sandboxed document",
+        "responses": {
+          "200": {
+            "description": "Rendered HTML playground",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "head": {
+        "summary": "Check whether rendered HTML exists",
+        "responses": {
+          "200": {
+            "description": "Rendered HTML exists"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/p/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/PlaygroundID"
+        }
+      ],
+      "get": {
+        "summary": "Open a hosted playground viewer",
+        "responses": {
+          "200": {
+            "description": "Viewer HTML",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Viewer shell with missing-record status"
+          }
+        }
+      },
+      "head": {
+        "summary": "Validate that a hosted viewer record exists",
+        "responses": {
+          "200": {
+            "description": "Viewer record exists"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "PlaygroundID": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{8,80}$"
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "publishTokenHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-PlayPen-Publish-Token"
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Publish token required",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "A playground with this id already exists. Use the replace route to update a stable hosted record.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "PayloadTooLarge": {
+        "description": "Payload exceeds maxPayloadBytes",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Playground not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Health": {
+        "type": "object",
+        "required": ["ok", "storage", "publicBaseURL", "publicBaseURLSource", "capabilitiesURL", "maxPayloadBytes", "publishAuthRequired"],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "storage": {
+            "type": "string",
+            "enum": ["filesystem", "s3"]
+          },
+          "publicBaseURL": {
+            "type": "string",
+            "format": "uri"
+          },
+          "publicBaseURLSource": {
+            "type": "string",
+            "enum": ["env", "request"]
+          },
+          "capabilitiesURL": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxPayloadBytes": {
+            "type": "integer"
+          },
+          "publishAuthRequired": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Stats": {
+        "type": "object",
+        "required": ["ok", "storage", "recordCount", "storageBytes", "kindCounts", "generatedAt"],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "storage": {
+            "type": "string",
+            "enum": ["filesystem", "s3"]
+          },
+          "recordCount": {
+            "type": "integer"
+          },
+          "storageBytes": {
+            "type": "integer"
+          },
+          "kindCounts": {
+            "$ref": "#/components/schemas/KindCounts"
+          },
+          "oldestPublishedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "newestPublishedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "KindCounts": {
+        "type": "object",
+        "required": ["html", "markdown"],
+        "properties": {
+          "html": {
+            "type": "integer"
+          },
+          "markdown": {
+            "type": "integer"
+          }
+        }
+      },
+      "PlaygroundList": {
+        "type": "object",
+        "required": ["ok", "storage", "total", "count", "limit", "offset", "items", "generatedAt"],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "storage": {
+            "type": "string",
+            "enum": ["filesystem", "s3"]
+          },
+          "total": {
+            "type": "integer"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlaygroundMetadata"
+            }
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Capabilities": {
+        "type": "object",
+        "required": ["version", "name", "publicBaseURL", "storage", "maxPayloadBytes", "publishAuth", "cors", "payload", "writePolicy", "errorCodes", "routes", "linkFormats", "appDeepLinks"],
+        "properties": {
+          "version": {
+            "type": "integer",
+            "const": 1
+          },
+          "name": {
+            "type": "string"
+          },
+          "publicBaseURL": {
+            "type": "string",
+            "format": "uri"
+          },
+          "storage": {
+            "type": "string",
+            "enum": ["filesystem", "s3"]
+          },
+          "maxPayloadBytes": {
+            "type": "integer"
+          },
+          "publishAuth": {
+            "type": "object"
+          },
+          "cors": {
+            "$ref": "#/components/schemas/CORS"
+          },
+          "payload": {
+            "type": "object"
+          },
+          "writePolicy": {
+            "type": "object",
+            "required": ["publish", "replace", "createAtomic", "duplicateIDStatus"],
+            "properties": {
+              "publish": {
+                "type": "string",
+                "const": "create"
+              },
+              "replace": {
+                "type": "string",
+                "const": "replace"
+              },
+              "createAtomic": {
+                "type": "boolean",
+                "const": true
+              },
+              "duplicateIDStatus": {
+                "type": "integer",
+                "const": 409
+              }
+            }
+          },
+          "errorCodes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "forbidden",
+                "internal_error",
+                "invalid_payload",
+                "method_not_allowed",
+                "not_found",
+                "payload_too_large",
+                "playground_conflict",
+                "playground_not_found",
+                "publish_token_required"
+              ]
+            }
+          },
+          "routes": {
+            "type": "object"
+          },
+          "linkFormats": {
+            "type": "object"
+          },
+          "appDeepLinks": {
+            "type": "object"
+          }
+        }
+      },
+      "CORS": {
+        "type": "object",
+        "required": ["publicRead", "allowOrigin", "methods", "exposeHeaders"],
+        "properties": {
+          "publicRead": {
+            "type": "boolean",
+            "const": true
+          },
+          "allowOrigin": {
+            "type": "string",
+            "const": "*"
+          },
+          "methods": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["GET", "HEAD", "OPTIONS"]
+            }
+          },
+          "exposeHeaders": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PlaygroundPayload": {
+        "type": "object",
+        "required": ["version", "title", "kind", "content"],
+        "properties": {
+          "version": {
+            "type": "integer",
+            "const": 1
+          },
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["markdown", "html"]
+          },
+          "annotation": {
+            "type": "string",
+            "description": "Optional provenance or review note for the artifact."
+          },
+          "content": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PublishResult": {
+        "type": "object",
+        "required": ["id", "url", "publishedAt", "metaURL", "manifestURL", "recordURL", "sourceURL", "contentDigest"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "annotation": {
+            "type": "string"
+          },
+          "metaURL": {
+            "type": "string",
+            "format": "uri"
+          },
+          "manifestURL": {
+            "type": "string",
+            "format": "uri"
+          },
+          "recordURL": {
+            "type": "string",
+            "format": "uri"
+          },
+          "sourceURL": {
+            "type": "string",
+            "format": "uri"
+          },
+          "renderURL": {
+            "type": "string",
+            "format": "uri",
+            "description": "HTML-only sandboxed render endpoint."
+          },
+          "contentDigest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      },
+      "PlaygroundMetadata": {
+        "type": "object",
+        "required": ["id", "title", "kind", "publishedAt", "contentBytes", "contentDigest", "url", "manifestURL", "recordURL", "sourceURL"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["markdown", "html"]
+          },
+          "annotation": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "contentBytes": {
+            "type": "integer"
+          },
+          "contentDigest": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "recordURL": {
+            "type": "string",
+            "format": "uri"
+          },
+          "manifestURL": {
+            "type": "string",
+            "format": "uri"
+          },
+          "sourceURL": {
+            "type": "string",
+            "format": "uri"
+          },
+          "renderURL": {
+            "type": "string",
+            "format": "uri",
+            "description": "HTML-only sandboxed render endpoint."
+          }
+        }
+      },
+      "ArtifactManifest": {
+        "type": "object",
+        "required": ["ok", "type", "version", "artifact", "links", "appDeepLinks", "commands"],
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "const": true
+          },
+          "type": {
+            "type": "string",
+            "const": "playpen.artifact"
+          },
+          "version": {
+            "type": "integer",
+            "const": 1
+          },
+          "artifact": {
+            "$ref": "#/components/schemas/PlaygroundMetadata"
+          },
+          "links": {
+            "type": "object",
+            "required": ["view", "record", "metadata", "manifest", "source", "openAPI", "capabilities"],
+            "properties": {
+              "view": {
+                "type": "string",
+                "format": "uri"
+              },
+              "record": {
+                "type": "string",
+                "format": "uri"
+              },
+              "metadata": {
+                "type": "string",
+                "format": "uri"
+              },
+              "manifest": {
+                "type": "string",
+                "format": "uri"
+              },
+              "source": {
+                "type": "string",
+                "format": "uri"
+              },
+              "render": {
+                "type": "string",
+                "format": "uri",
+                "description": "HTML-only sandboxed render endpoint."
+              },
+              "openAPI": {
+                "type": "string",
+                "format": "uri"
+              },
+              "capabilities": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          },
+          "appDeepLinks": {
+            "type": "object"
+          },
+          "commands": {
+            "type": "object"
+          }
+        }
+      },
+      "DeleteResult": {
+        "type": "object",
+        "required": ["ok", "id"],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error", "code"],
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "forbidden",
+              "internal_error",
+              "invalid_payload",
+              "method_not_allowed",
+              "not_found",
+              "payload_too_large",
+              "playground_conflict",
+              "playground_not_found",
+              "publish_token_required"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "replaceURL": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maxPayloadBytes": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

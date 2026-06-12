@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlayPen - Native playgrounds for useful technical notes</title>
+<style>
+  :root {
+    color-scheme: light;
+    --ink: oklch(0.16 0.01 252);
+    --soft-ink: oklch(0.29 0.018 252);
+    --muted: oklch(0.47 0.02 252);
+    --subtle: oklch(0.66 0.014 252);
+    --paper: oklch(0.985 0.004 248);
+    --white: oklch(1 0 0);
+    --mist: oklch(0.955 0.01 250);
+    --panel: oklch(0.995 0.002 250 / 0.86);
+    --line: oklch(0.84 0.01 252 / 0.78);
+    --blue: oklch(0.58 0.22 254);
+    --blue-dark: oklch(0.5 0.22 255);
+    --graphite: oklch(0.2 0.012 252);
+    --graphite-soft: oklch(0.28 0.014 252);
+    --shadow-soft: 0 24px 80px oklch(0.2 0.012 252 / 0.14);
+    --shadow-lift: 0 36px 110px oklch(0.19 0.012 252 / 0.18);
+    --max: 1240px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    text-rendering: optimizeLegibility;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, oklch(1 0 0) 0%, var(--paper) 48%, oklch(0.96 0.009 248) 100%),
+      radial-gradient(circle at 18% 4%, oklch(0.92 0.04 254 / 0.34), transparent 30%);
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  figure {
+    margin: 0;
+  }
+
+  svg {
+    display: block;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 3px solid oklch(0.68 0.18 252 / 0.72);
+    outline-offset: 4px;
+  }
+
+  .site-header {
+    position: fixed;
+    z-index: 30;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 72px;
+    padding: 16px 42px;
+    color: var(--ink);
+    border-bottom: 1px solid oklch(0.84 0.01 252 / 0.52);
+    background: oklch(1 0 0 / 0.82);
+    backdrop-filter: blur(18px);
+  }
+
+  .brand {
+    font-size: 16px;
+    font-weight: 760;
+    letter-spacing: 0;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+  }
+
+  .nav a {
+    color: var(--soft-ink);
+    font-size: 14px;
+    font-weight: 660;
+    text-decoration: none;
+    transition: color .2s ease;
+  }
+
+  .nav a:hover {
+    color: var(--blue);
+  }
+
+  .hero {
+    position: relative;
+    min-height: 84svh;
+    display: grid;
+    align-items: end;
+    overflow: hidden;
+    isolation: isolate;
+    padding: 118px 42px 52px;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -3;
+    background: url("assets/playpen-hero-devices.png") center right / cover no-repeat;
+    transform: scale(1.01);
+    animation: heroDrift 18s ease-in-out infinite alternate;
+  }
+
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+      linear-gradient(90deg, oklch(0.985 0.004 248 / 0.98) 0%, oklch(0.985 0.004 248 / 0.9) 25%, oklch(0.985 0.004 248 / 0.42) 52%, oklch(0.985 0.004 248 / 0.08) 78%),
+      linear-gradient(180deg, oklch(1 0 0 / 0.72) 0%, transparent 22%, oklch(0.16 0.01 252 / 0.18) 100%);
+  }
+
+  .hero-inner {
+    width: 100%;
+    max-width: var(--max);
+    margin: 0 auto;
+  }
+
+  .hero-copy {
+    width: 100%;
+    max-width: 560px;
+    animation: enterUp .72s cubic-bezier(.2, .8, .2, 1) .08s both;
+  }
+
+  h1,
+  h2,
+  h3,
+  p {
+    margin-top: 0;
+  }
+
+  h1 {
+    margin-bottom: 20px;
+    max-width: 8ch;
+    font-size: 96px;
+    line-height: .88;
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+
+  .hero-subhead {
+    max-width: 520px;
+    margin-bottom: 18px;
+    color: var(--soft-ink);
+    font-size: 31px;
+    line-height: 1.12;
+    font-weight: 720;
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+
+  .hero-body {
+    max-width: 480px;
+    margin-bottom: 0;
+    color: var(--muted);
+    font-size: 17px;
+    line-height: 1.62;
+    text-wrap: pretty;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 19px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink);
+    background: oklch(1 0 0 / 0.78);
+    font-size: 14px;
+    font-weight: 760;
+    text-decoration: none;
+    box-shadow: 0 1px 0 oklch(1 0 0 / 0.8) inset;
+    transition: transform .2s ease, color .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+
+  .button:hover {
+    transform: translateY(-2px);
+    border-color: oklch(0.72 0.025 252);
+    box-shadow: 0 10px 30px oklch(0.2 0.012 252 / 0.1);
+  }
+
+  .button.primary {
+    color: var(--white);
+    border-color: var(--blue);
+    background: var(--blue);
+    box-shadow: 0 16px 38px oklch(0.58 0.22 254 / 0.24);
+  }
+
+  .button.primary:hover {
+    background: var(--blue-dark);
+    border-color: var(--blue-dark);
+  }
+
+  .capability-rail {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: oklch(1 0 0 / 0.72);
+  }
+
+  .capability {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px;
+    align-items: start;
+    min-height: 116px;
+    padding: 26px 42px;
+    border-right: 1px solid var(--line);
+  }
+
+  .capability:last-child {
+    border-right: 0;
+  }
+
+  .capability-mark {
+    width: 22px;
+    height: 22px;
+    margin-top: 2px;
+    color: var(--blue);
+  }
+
+  .capability b {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 15px;
+    letter-spacing: 0;
+  }
+
+  .capability span {
+    display: block;
+    max-width: 34ch;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  section {
+    scroll-margin-top: 86px;
+    padding: 118px 42px;
+  }
+
+  .section-inner {
+    width: 100%;
+    max-width: var(--max);
+    margin: 0 auto;
+  }
+
+  .section-heading {
+    display: grid;
+    grid-template-columns: minmax(320px, 560px) minmax(260px, 1fr);
+    gap: 80px;
+    align-items: end;
+    margin-bottom: 62px;
+  }
+
+  h2 {
+    margin-bottom: 0;
+    font-size: 72px;
+    line-height: .96;
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+
+  .section-heading p,
+  .section-lede {
+    max-width: 64ch;
+    margin-bottom: 0;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1.58;
+    text-wrap: pretty;
+  }
+
+  .workflow {
+    background: var(--white);
+  }
+
+  .workflow-topline {
+    display: grid;
+    grid-template-columns: minmax(280px, 540px) 1fr;
+    gap: 70px;
+    align-items: start;
+    margin-bottom: 52px;
+  }
+
+  .workflow-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    padding-top: 10px;
+  }
+
+  .workflow-step {
+    position: relative;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+  }
+
+  .workflow-step::before {
+    content: attr(data-step);
+    display: block;
+    margin-bottom: 14px;
+    color: var(--blue);
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+
+  .workflow-step h3 {
+    margin-bottom: 8px;
+    font-size: 24px;
+    line-height: 1.08;
+    letter-spacing: 0;
+  }
+
+  .workflow-step p {
+    max-width: 28ch;
+    margin-bottom: 0;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.48;
+  }
+
+  .workspace-stage {
+    display: grid;
+    grid-template-columns: .72fr 1fr;
+    gap: 34px;
+    align-items: end;
+  }
+
+  .window-shot {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--white);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .window-shot.large {
+    box-shadow: var(--shadow-lift);
+  }
+
+  .window-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    height: 34px;
+    padding: 0 14px;
+    border-bottom: 1px solid var(--line);
+    background: oklch(0.98 0.003 250);
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .dot.red {
+    background: oklch(0.68 0.2 28);
+  }
+
+  .dot.yellow {
+    background: oklch(0.77 0.16 80);
+  }
+
+  .dot.green {
+    background: oklch(0.69 0.18 148);
+  }
+
+  .window-shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .source-shot {
+    transform: translateY(38px);
+  }
+
+  .native {
+    position: relative;
+    overflow: hidden;
+    color: var(--white);
+    background:
+      linear-gradient(135deg, oklch(0.17 0.012 252), var(--graphite) 56%, oklch(0.16 0.014 258));
+  }
+
+  .native::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, oklch(1 0 0 / 0.05) 1px, transparent 1px),
+      linear-gradient(180deg, oklch(1 0 0 / 0.05) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: linear-gradient(180deg, transparent, black 18%, black 78%, transparent);
+  }
+
+  .native .section-inner {
+    position: relative;
+  }
+
+  .native .section-heading p,
+  .native .native-detail p {
+    color: oklch(0.82 0.014 252);
+  }
+
+  .native-layout {
+    display: grid;
+    grid-template-columns: minmax(300px, .76fr) minmax(360px, 1.24fr);
+    gap: 70px;
+    align-items: center;
+  }
+
+  .native-list {
+    border-top: 1px solid oklch(1 0 0 / 0.22);
+  }
+
+  .native-detail {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 18px;
+    padding: 25px 0;
+    border-bottom: 1px solid oklch(1 0 0 / 0.22);
+  }
+
+  .native-detail-mark {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    color: oklch(0.77 0.13 250);
+    background: oklch(1 0 0 / 0.09);
+    font-size: 14px;
+    font-weight: 850;
+  }
+
+  .native-detail h3 {
+    margin-bottom: 7px;
+    font-size: 24px;
+    line-height: 1.1;
+    letter-spacing: 0;
+  }
+
+  .native-detail p {
+    margin-bottom: 0;
+    font-size: 15px;
+    line-height: 1.56;
+  }
+
+  .native-visual {
+    overflow: hidden;
+    border: 1px solid oklch(1 0 0 / 0.18);
+    border-radius: 8px;
+    background: var(--graphite-soft);
+    box-shadow: 0 34px 110px oklch(0 0 0 / 0.36);
+  }
+
+  .native-visual img {
+    display: block;
+    width: 100%;
+    height: 640px;
+    object-fit: cover;
+    object-position: top left;
+  }
+
+  .screens {
+    padding-bottom: 96px;
+    background: var(--paper);
+  }
+
+  .screen-pair {
+    display: grid;
+    grid-template-columns: 1.08fr .92fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  .screen-caption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 54px;
+    padding: 0 2px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 660;
+  }
+
+  .screen-caption span:last-child {
+    color: var(--subtle);
+    font-weight: 620;
+  }
+
+  .screen-frame {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--white);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .screen-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .closing {
+    position: relative;
+    scroll-margin-top: 86px;
+    min-height: 76svh;
+    display: grid;
+    align-items: center;
+    overflow: hidden;
+    isolation: isolate;
+    padding-bottom: 86px;
+    background: var(--white);
+  }
+
+  .closing::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -3;
+    background: url("assets/playpen-hero-devices.png") center right / cover no-repeat;
+    transform: scale(1.02);
+  }
+
+  .closing::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+      linear-gradient(90deg, oklch(1 0 0 / 0.98) 0%, oklch(1 0 0 / 0.88) 30%, oklch(1 0 0 / 0.38) 59%, oklch(1 0 0 / 0.02) 84%),
+      linear-gradient(0deg, oklch(1 0 0) 0%, transparent 18%);
+  }
+
+  .closing-copy {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .closing h2 {
+    margin-bottom: 20px;
+  }
+
+  .closing p {
+    max-width: 520px;
+    margin-bottom: 0;
+    color: var(--muted);
+    font-size: 19px;
+    line-height: 1.55;
+  }
+
+  .footer-line {
+    position: absolute;
+    left: 42px;
+    right: 42px;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 70px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 650;
+  }
+
+  .footer-line b {
+    color: var(--ink);
+    font-size: 16px;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  @keyframes enterUp {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes heroDrift {
+    from {
+      transform: scale(1.01) translateX(0);
+    }
+
+    to {
+      transform: scale(1.04) translateX(-12px);
+    }
+  }
+
+  @media (max-width: 980px) {
+    .site-header {
+      padding: 14px 22px;
+    }
+
+    .nav {
+      gap: 16px;
+    }
+
+    .hero {
+      min-height: 80svh;
+      padding: 108px 22px 42px;
+      align-items: end;
+    }
+
+    .hero-copy,
+    .closing-copy {
+      width: calc(100vw - 44px);
+      max-width: calc(100vw - 44px);
+    }
+
+    .hero-subhead,
+    .hero-body,
+    .closing p {
+      max-width: 100%;
+    }
+
+    .hero::before {
+      background-position: 60% center;
+    }
+
+    .hero::after {
+      background:
+        linear-gradient(0deg, oklch(0.985 0.004 248 / 0.98) 0%, oklch(0.985 0.004 248 / 0.92) 43%, oklch(0.985 0.004 248 / 0.18) 80%),
+        linear-gradient(90deg, oklch(0.985 0.004 248 / 0.6), oklch(0.985 0.004 248 / 0.04));
+    }
+
+    h1 {
+      font-size: 72px;
+    }
+
+    h2 {
+      font-size: 52px;
+    }
+
+    .hero-subhead {
+      font-size: 25px;
+    }
+
+    .capability-rail,
+    .workflow-topline,
+    .section-heading,
+    .native-layout,
+    .screen-pair {
+      grid-template-columns: 1fr;
+    }
+
+    .capability {
+      min-height: auto;
+      padding: 22px;
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .capability:last-child {
+      border-bottom: 0;
+    }
+
+    section {
+      padding: 84px 22px;
+    }
+
+    .section-heading,
+    .workflow-topline,
+    .native-layout {
+      gap: 34px;
+    }
+
+    .workflow-steps {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .workspace-stage {
+      grid-template-columns: 1fr;
+      gap: 22px;
+    }
+
+    .source-shot {
+      transform: none;
+    }
+
+    .footer-line {
+      left: 22px;
+      right: 22px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .site-header {
+      min-height: 62px;
+    }
+
+    .nav a:first-child {
+      display: none;
+    }
+
+    .hero {
+      min-height: 78svh;
+    }
+
+    h1 {
+      font-size: 58px;
+    }
+
+    h2 {
+      font-size: 42px;
+    }
+
+    .hero-subhead {
+      font-size: 22px;
+    }
+
+    .hero-body,
+    .section-heading p,
+    .section-lede,
+    .closing p {
+      font-size: 16px;
+    }
+
+    .button {
+      min-height: 46px;
+    }
+
+    .workspace-stage {
+      margin-inline: -22px;
+    }
+
+    .window-shot,
+    .screen-frame,
+    .native-visual {
+      border-radius: 0;
+      border-left: 0;
+      border-right: 0;
+    }
+
+    .native-visual img {
+      height: 520px;
+    }
+
+    .screen-pair {
+      gap: 38px;
+    }
+
+    .closing {
+      min-height: 72svh;
+      padding-top: 88px;
+    }
+
+    .closing::before {
+      background-position: 63% center;
+    }
+
+    .closing::after {
+      background:
+        linear-gradient(0deg, oklch(1 0 0 / 0.99) 0%, oklch(1 0 0 / 0.94) 48%, oklch(1 0 0 / 0.16) 82%),
+        linear-gradient(90deg, oklch(1 0 0 / 0.52), oklch(1 0 0 / 0.04));
+    }
+
+    .footer-line {
+      min-height: 64px;
+      font-size: 13px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="brand">PlayPen</div>
+  <nav class="nav" aria-label="Primary navigation">
+    <a href="#workflow">Workflow</a>
+    <a href="#screens">Screenshots</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <h1 id="hero-title">PlayPen</h1>
+        <p class="hero-subhead">A native place for rough notes to become useful again.</p>
+        <p class="hero-body">Write Markdown or HTML, preview it, tag it, and return to the useful part without building a project around it.</p>
+        <div class="actions">
+          <a class="button primary" href="#screens">View screenshots</a>
+          <a class="button" href="#workflow">Explore workflow</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="capability-rail" aria-label="Product highlights">
+    <div class="capability">
+      <svg class="capability-mark" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 4h10M7 20h10M4 7v10M20 7v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <b>Markdown and HTML</b>
+        <span>One library for source snippets, rendered notes, and imported playgrounds.</span>
+      </div>
+    </div>
+    <div class="capability">
+      <svg class="capability-mark" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 5h6v14H4zM14 5h6v14h-6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <b>Native split view</b>
+        <span>Project, list, source, and preview stay visible together on Mac and iPad.</span>
+      </div>
+    </div>
+    <div class="capability">
+      <svg class="capability-mark" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 21s7-5.2 7-11A7 7 0 1 0 5 10c0 5.8 7 11 7 11z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M12 10.5h.01" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <b>Context built in</b>
+        <span>Tags, annotations, outline navigation, and search keep experiments findable.</span>
+      </div>
+    </div>
+  </div>
+
+  <section id="workflow" class="workflow" aria-labelledby="workflow-title">
+    <div class="section-inner">
+      <div class="workflow-topline reveal">
+        <div>
+          <h2 id="workflow-title">Source, preview, file it.</h2>
+        </div>
+        <div class="workflow-steps" aria-label="PlayPen workflow">
+          <div class="workflow-step" data-step="01">
+            <h3>Write</h3>
+            <p>Capture the real draft: Markdown, HTML, links, code, tables, and half-formed structure.</p>
+          </div>
+          <div class="workflow-step" data-step="02">
+            <h3>Preview</h3>
+            <p>Switch between source and rendered output while the library stays in view.</p>
+          </div>
+          <div class="workflow-step" data-step="03">
+            <h3>Find</h3>
+            <p>Use projects, tags, outline, search, and place context when the note needs it.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="workspace-stage reveal" aria-label="PlayPen source and preview screenshots">
+        <figure class="window-shot source-shot">
+          <div class="window-bar" aria-hidden="true">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <img src="screenshots/playpen-source-full.png" alt="PlayPen source mode showing Markdown text for the selected playground." width="2064" height="2752" loading="lazy">
+        </figure>
+        <figure class="window-shot large">
+          <div class="window-bar" aria-hidden="true">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <img src="screenshots/playpen-preview-full.png" alt="PlayPen preview mode showing the same playground rendered with tags and a code block." width="2064" height="2752" loading="lazy">
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="native" aria-labelledby="native-title">
+    <div class="section-inner">
+      <div class="section-heading reveal">
+        <h2 id="native-title">Everything stays close to the note.</h2>
+        <p>PlayPen keeps the system chrome quiet: direct controls, readable type, native split view behavior, and nothing ornamental between you and the experiment.</p>
+      </div>
+
+      <div class="native-layout">
+        <div class="native-list reveal">
+          <div class="native-detail">
+            <div class="native-detail-mark">01</div>
+            <div>
+              <h3>Quick enough for spikes</h3>
+              <p>Open, edit, preview, and search without starting a new repo every time a small idea appears.</p>
+            </div>
+          </div>
+          <div class="native-detail">
+            <div class="native-detail-mark">02</div>
+            <div>
+              <h3>Organized without ceremony</h3>
+              <p>Projects hold the lanes. Tags keep the useful cross-cuts, from SwiftUI to networking.</p>
+            </div>
+          </div>
+          <div class="native-detail">
+            <div class="native-detail-mark">03</div>
+            <div>
+              <h3>Annotated when it helps</h3>
+              <p>Add provenance, review notes, or agent handoff context without extra permission prompts.</p>
+            </div>
+          </div>
+        </div>
+
+        <figure class="native-visual reveal">
+          <img src="screenshots/playpen-preview-full.png" alt="PlayPen preview mode showing the selected playground in the native split view." width="2064" height="2752" loading="lazy">
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="screens" class="screens" aria-labelledby="screens-title">
+    <div class="section-inner">
+      <div class="section-heading reveal">
+        <h2 id="screens-title">Screens from the live build.</h2>
+        <p>The product imagery is based on a running PlayPen app. These screenshots are captured from the same source and preview states shown in the hero devices.</p>
+      </div>
+
+      <div class="screen-pair reveal">
+        <figure>
+          <figcaption class="screen-caption">
+            <span>Preview mode</span>
+            <span>Rendered note</span>
+          </figcaption>
+          <div class="screen-frame">
+            <img src="screenshots/playpen-preview-full.png" alt="Full PlayPen screenshot with the Preview tab selected." width="2064" height="2752" loading="lazy">
+          </div>
+        </figure>
+
+        <figure>
+          <figcaption class="screen-caption">
+            <span>Source mode</span>
+            <span>Markdown draft</span>
+          </figcaption>
+          <div class="screen-frame">
+            <img src="screenshots/playpen-source-full.png" alt="Full PlayPen screenshot with the Markdown source tab selected." width="2064" height="2752" loading="lazy">
+          </div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="closing" aria-labelledby="closing-title">
+    <div class="section-inner">
+      <div class="closing-copy reveal">
+        <h2 id="closing-title">Keep the useful parts.</h2>
+        <p>PlayPen gives experiments a native home, so the next idea starts faster.</p>
+        <div class="actions">
+          <a class="button primary" href="#screens">Open screenshots</a>
+          <a class="button" href="#workflow">Review workflow</a>
+        </div>
+      </div>
+    </div>
+    <footer class="footer-line">
+      <b>PlayPen</b>
+      <span>Mac / iPad / iPhone</span>
+    </footer>
+  </section>
+</main>
+
+</body>
+</html>

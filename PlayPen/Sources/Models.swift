@@ -1,4 +1,3 @@
-import CoreLocation
 import Foundation
 import SwiftData
 
@@ -51,11 +50,13 @@ final class Playground {
     var title: String = ""
     var content: String = ""
     var kindRawValue: String = PlaygroundKind.markdown.rawValue
+    var annotation: String = ""
     var createdAt: Date = Date.now
     var modifiedAt: Date = Date.now
-    var latitude: Double?
-    var longitude: Double?
-    var placeName: String?
+    var hostedID: String?
+    var hostedURLString: String?
+    var hostedPublishedAt: Date?
+    var hostedContentDigest: String?
     var project: Project?
 
     @Relationship(inverse: \Tag.playgrounds)
@@ -75,21 +76,37 @@ final class Playground {
         set { kindRawValue = newValue.rawValue }
     }
 
-    var hasLocation: Bool {
-        latitude != nil && longitude != nil
-    }
-
-    var coordinate: CLLocationCoordinate2D? {
-        guard let latitude, let longitude else { return nil }
-        return CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-    }
-
     var snippet: String {
         let firstContentLine = content
             .split(separator: "\n")
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .first { !$0.isEmpty && !$0.hasPrefix("#") }
         return firstContentLine ?? "Empty playground"
+    }
+}
+
+@MainActor
+extension Playground {
+    var hostedURL: URL? {
+        get {
+            guard let hostedURLString, !hostedURLString.isEmpty else { return nil }
+            return URL(string: hostedURLString)
+        }
+        set {
+            hostedURLString = newValue?.absoluteString
+        }
+    }
+
+    var hasHostedMirror: Bool {
+        hostedURL != nil
+    }
+
+    var hasAnnotation: Bool {
+        !annotation.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var isHostedMirrorCurrent: Bool {
+        hostedContentDigest == HostedPlaygroundService.contentDigest(for: self)
     }
 }
 

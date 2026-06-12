@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 
 enum SampleData {
-    private static let hasSeededKey = "SampleData.hasSeeded"
+    private static let hasSeededKey = "SampleData.hasSeeded.v3"
 
     static func seedIfNeeded(context: ModelContext) {
         guard !UserDefaults.standard.bool(forKey: hasSeededKey) else { return }
@@ -14,22 +14,183 @@ enum SampleData {
         }
 
         let swiftUIProject = Project(name: "SwiftUI Experiments")
+        swiftUIProject.sortIndex = 0
         let apiProject = Project(name: "API Spikes")
-        context.insert(swiftUIProject)
-        context.insert(apiProject)
+        apiProject.sortIndex = 1
+        let fieldNotesProject = Project(name: "Field Notes")
+        fieldNotesProject.sortIndex = 2
+        let webClipsProject = Project(name: "Web Clips")
+        webClipsProject.sortIndex = 3
+
+        [swiftUIProject, apiProject, fieldNotesProject, webClipsProject].forEach { context.insert($0) }
 
         let swiftTag = Tag(name: "swift")
         let uiTag = Tag(name: "ui")
         let networkingTag = Tag(name: "networking")
+        let reliabilityTag = Tag(name: "reliability")
+        let htmlTag = Tag(name: "html")
+        let polishTag = Tag(name: "polish")
+        let docsTag = Tag(name: "docs")
         let ideaTag = Tag(name: "idea")
-        [swiftTag, uiTag, networkingTag, ideaTag].forEach { context.insert($0) }
 
-        let glassPlayground = Playground(
+        [
+            swiftTag,
+            uiTag,
+            networkingTag,
+            reliabilityTag,
+            htmlTag,
+            polishTag,
+            docsTag,
+            ideaTag
+        ].forEach { context.insert($0) }
+
+        let retryPlayground = addPlayground(
+            title: "Retry Budget + Jitter",
+            content: """
+            # Retry Budget + Jitter
+
+            Keep retry time inside the request budget. The staging API gets noisy after deploys, but the UI should still fail predictably.
+
+            ## Current rule
+
+            | Attempt | Delay | Notes |
+            | --- | ---: | --- |
+            | 1 | 0.25s | optimistic fast path |
+            | 2 | 0.75s | add jitter |
+            | 3 | 1.50s | final visible attempt |
+
+            ```swift
+            struct RetryBudget {
+                let attempts = 3
+                let totalTimeout: Duration = .seconds(5)
+
+                func delay(for attempt: Int) -> Duration {
+                    let base = pow(2.0, Double(attempt)) * 0.25
+                    let jitter = Double.random(in: 0...0.35)
+                    return .milliseconds(Int((base + jitter) * 1000))
+                }
+            }
+            ```
+
+            ## Follow-ups
+
+            - Surface the final error inline, not in a sheet
+            - Log exhausted retries with request family and endpoint
+            - Re-test on the coffee shop network before shipping
+            """,
+            project: apiProject,
+            tags: [swiftTag, networkingTag, reliabilityTag],
+            minutesAgo: 4,
+            context: context
+        )
+
+        addPlayground(
+            title: "Offline Save Queue",
+            content: """
+            # Offline Save Queue
+
+            Notes from testing edits during a subway ride. The editor should keep accepting input even while sync is parked.
+
+            ## Queue shape
+
+            ```swift
+            enum PendingWrite {
+                case create(id: UUID, body: String)
+                case update(id: UUID, patch: Patch)
+                case delete(id: UUID)
+            }
+            ```
+
+            - Merge adjacent edits before replay
+            - Keep deleted playgrounds tombstoned for one sync pass
+            - Show "Saved on device" when the network is down
+            """,
+            project: apiProject,
+            tags: [swiftTag, networkingTag, reliabilityTag],
+            minutesAgo: 18,
+            context: context
+        )
+
+        addPlayground(
+            title: "Share Sheet Import QA",
+            content: """
+            # Share Sheet Import QA
+
+            Importing from Safari, Files, and Mail should all land in the same review flow.
+
+            ## Test matrix
+
+            | Source | Markdown | HTML | Result |
+            | --- | --- | --- | --- |
+            | Safari reader | yes | yes | strips tracking links |
+            | Files | yes | no | keeps file title |
+            | Mail | partial | yes | needs cleanup pass |
+
+            The empty title case is fixed. Still need a friendlier duplicate filename prompt.
+            """,
+            project: apiProject,
+            tags: [docsTag, networkingTag, polishTag],
+            minutesAgo: 31,
+            context: context
+        )
+
+        addPlayground(
+            title: "Command Palette Notes",
+            content: """
+            # Command Palette Notes
+
+            Fast actions should feel native, not like a web overlay.
+
+            ## Commands to keep
+
+            - New Playground
+            - Import Files
+            - Copy Rendered HTML
+            - Move to Project
+            - Toggle Preview
+
+            ```swift
+            CommandGroup(after: .newItem) {
+                Button("New Playground") { newPlayground() }
+                    .keyboardShortcut("n", modifiers: .command)
+            }
+            ```
+
+            Keep icons quiet. The palette should scan by verb first, shortcut second.
+            """,
+            project: swiftUIProject,
+            tags: [swiftTag, uiTag, polishTag],
+            minutesAgo: 44,
+            context: context
+        )
+
+        addPlayground(
+            title: "Inline Table Renderer",
+            content: """
+            # Inline Table Renderer
+
+            Markdown tables need to stay readable in narrow preview columns.
+
+            | Case | Behavior |
+            | --- | --- |
+            | two columns | normal table |
+            | five columns | horizontal scroll |
+            | no header | render as simple grid |
+
+            Next pass: add a subtle edge fade when the table can scroll sideways.
+            """,
+            project: swiftUIProject,
+            tags: [swiftTag, uiTag, docsTag],
+            minutesAgo: 58,
+            context: context
+        )
+
+        addPlayground(
             title: "Liquid Glass Buttons",
             content: """
             # Liquid Glass Buttons
 
-            Exploring the new glass button styles introduced in macOS 26 Tahoe.
+            Exploring the new glass button styles introduced in macOS Tahoe.
 
             ## Findings
 
@@ -42,61 +203,124 @@ enum SampleData {
                 .buttonStyle(.glassProminent)
             ```
 
-            > Don't stack glass on glass — toolbars and sidebars already get it for free.
+            Avoid stacking glass on glass. Toolbars and sidebars already get it for free.
             """,
-            project: swiftUIProject
+            project: swiftUIProject,
+            tags: [swiftTag, uiTag, polishTag],
+            minutesAgo: 76,
+            context: context
         )
-        glassPlayground.tags = [swiftTag, uiTag]
 
-        let flowPlayground = Playground(
-            title: "Flow Layout for Tags",
+        addPlayground(
+            title: "Artifact Annotation Notes",
             content: """
-            # Flow Layout
+            # Artifact Annotation Notes
 
-            A custom `Layout` that wraps capsule tags onto multiple lines.
+            Notes need lightweight context without asking for device permissions or adding another navigation surface.
 
-            | Approach | Verdict |
-            | --- | --- |
-            | LazyVGrid adaptive | columns, not true wrapping |
-            | Custom `Layout` | exactly what we want |
-            | HStack + manual math | fragile |
+            ## Annotation behavior
 
-            1. Measure each subview
-            2. Place left to right
-            3. Wrap when the line is full
+            - Keep a short note beside the source
+            - Publish the annotation with hosted records
+            - Treat it as review context, not rendered content
+
+            Good examples: "Generated during visual QA", "Needs security review", "Imported from a support repro".
             """,
-            project: swiftUIProject
+            project: fieldNotesProject,
+            tags: [polishTag, ideaTag],
+            minutesAgo: 93,
+            annotation: "Use annotations for provenance or review notes.",
+            context: context
         )
-        flowPlayground.tags = [swiftTag, uiTag, ideaTag]
 
-        let retryPlayground = Playground(
-            title: "Retry with Exponential Backoff",
+        addPlayground(
+            title: "Coffee Shop Latency",
             content: """
-            # Retry Strategy
+            # Coffee Shop Latency
 
-            Testing **exponential backoff** with jitter against the staging API.
+            Captured while pairing on weak Wi-Fi. Useful repro for slow sync and preview refresh.
 
-            ```swift
-            func retry<T>(maxAttempts: Int = 3, operation: () async throws -> T) async throws -> T {
-                for attempt in 0..<maxAttempts {
-                    do { return try await operation() }
-                    catch where attempt < maxAttempts - 1 {
-                        let delay = pow(2.0, Double(attempt)) + .random(in: 0...0.5)
-                        try await Task.sleep(for: .seconds(delay))
-                    }
-                }
-                fatalError("unreachable")
-            }
+            ```text
+            average ping: 180ms
+            packet loss: 3%
+            preview refresh: visible after second save
             ```
 
-            See [the AWS architecture blog](https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/) for the jitter rationale.
+            Keep this around for offline save queue testing.
             """,
-            project: apiProject
+            project: fieldNotesProject,
+            tags: [networkingTag, reliabilityTag],
+            minutesAgo: 117,
+            annotation: "Weak network repro captured during manual QA.",
+            context: context
         )
-        retryPlayground.tags = [swiftTag, networkingTag]
 
-        [glassPlayground, flowPlayground, retryPlayground].forEach { context.insert($0) }
+        addPlayground(
+            title: "HTML Embed Sanitizer",
+            content: """
+            <h1>HTML Embed Sanitizer</h1>
+            <p>Imported snippets need a narrow safe subset before preview.</p>
+            <ul>
+              <li>Allow inline code, tables, links, and images.</li>
+              <li>Strip scripts, iframes, and external stylesheets.</li>
+              <li>Keep source untouched so users can recover the original.</li>
+            </ul>
+            <pre><code>let allowedTags = ["p", "a", "code", "pre", "table"]</code></pre>
+            """,
+            kind: .html,
+            project: webClipsProject,
+            tags: [htmlTag, docsTag, reliabilityTag],
+            minutesAgo: 142,
+            context: context
+        )
+
+        addPlayground(
+            title: "Launch Copy Fragments",
+            content: """
+            # Launch Copy Fragments
+
+            Candidate language for the marketing page.
+
+            > A native place for rough notes to become useful again.
+
+            Stronger than "knowledge base" because the product is lighter than that. The promise is speed, trust, and finding the useful bit later.
+
+            ## Keep
+
+            - native
+            - quick
+            - source and preview
+            - real screenshots
+            """,
+            project: webClipsProject,
+            tags: [docsTag, htmlTag, ideaTag],
+            minutesAgo: 188,
+            context: context
+        )
+
+        _ = retryPlayground
         try? context.save()
         UserDefaults.standard.set(true, forKey: hasSeededKey)
+    }
+
+    @discardableResult
+    private static func addPlayground(
+        title: String,
+        content: String,
+        kind: PlaygroundKind = .markdown,
+        project: Project,
+        tags: [Tag],
+        minutesAgo: Int,
+        annotation: String = "",
+        context: ModelContext
+    ) -> Playground {
+        let playground = Playground(title: title, content: content, kind: kind, project: project)
+        let timestamp = Calendar.current.date(byAdding: .minute, value: -minutesAgo, to: .now) ?? .now
+        playground.createdAt = timestamp
+        playground.modifiedAt = timestamp
+        playground.tags = tags
+        playground.annotation = annotation
+        context.insert(playground)
+        return playground
     }
 }

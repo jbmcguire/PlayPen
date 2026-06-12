@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Host and open PlayPen HTML or Markdown playgrounds as shareable links.">
+<title>PlayPen Hosted Mirror</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="shell">
+  <section class="intro" id="composer">
+    <div>
+      <h1>PlayPen Mirror</h1>
+      <p>Open a shared playground link, or create one from Markdown or HTML without a backend.</p>
+    </div>
+    <form class="composer-form" id="composer-form">
+      <label>
+        Title
+        <input id="title-input" name="title" autocomplete="off" placeholder="Untitled playground">
+      </label>
+      <label>
+        Kind
+        <select id="kind-input" name="kind">
+          <option value="markdown">Markdown</option>
+          <option value="html">HTML</option>
+        </select>
+      </label>
+      <label class="annotation-field">
+        Annotation
+        <input id="annotation-input" name="annotation" autocomplete="off" placeholder="Review note or provenance">
+      </label>
+      <label class="token-field">
+        Publish token
+        <input id="publish-token-input" name="publish-token" type="password" autocomplete="off" placeholder="Optional">
+      </label>
+      <label class="source-field">
+        Source
+        <textarea id="source-input" name="source" spellcheck="false" placeholder="# Paste a playground here"></textarea>
+      </label>
+      <div class="file-row">
+        <input id="file-input" type="file" accept=".html,.htm,.md,.markdown,text/html,text/markdown,text/plain">
+        <button class="primary" type="submit">Create mirror link</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="viewer" id="viewer" hidden>
+    <header class="viewer-header">
+      <div>
+        <p class="service-label">Hosted mirror</p>
+        <h1 id="playground-title"></h1>
+        <p class="metadata" id="metadata"></p>
+        <p class="annotation" id="annotation" hidden></p>
+      </div>
+      <div class="actions">
+        <a id="open-in-playpen" href="#">Open in PlayPen</a>
+        <a id="configure-playpen" href="#">Use as Host</a>
+        <a id="record-json" href="#" hidden>Record JSON</a>
+        <a id="metadata-link" href="#" hidden>Metadata</a>
+        <a id="manifest-link" href="#" hidden>Manifest</a>
+        <a id="source-link" href="#" hidden>Raw source</a>
+        <button id="copy-link" type="button">Copy link</button>
+        <button id="download-source" type="button">Download source</button>
+        <a id="new-link" href="index.html">New</a>
+      </div>
+    </header>
+    <div class="tabs" role="tablist" aria-label="Playground view">
+      <button class="active" id="preview-tab" type="button" role="tab" aria-selected="true">Preview</button>
+      <button id="source-tab" type="button" role="tab" aria-selected="false">Source</button>
+    </div>
+    <div class="panel preview-panel" id="preview-panel" role="tabpanel" aria-labelledby="preview-tab"></div>
+    <pre class="panel source-panel" id="source-panel" role="tabpanel" aria-labelledby="source-tab" hidden></pre>
+  </section>
+
+  <section class="error-state" id="error-state" hidden>
+    <div>
+      <h1>Link could not open</h1>
+      <p id="error-message">This mirror link is missing or malformed.</p>
+    </div>
+    <a href="index.html">Create a new mirror link</a>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
