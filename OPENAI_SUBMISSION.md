@@ -6,6 +6,20 @@ PlayPen is open-source infrastructure for AI-generated artifacts. It lets agents
 
 The core idea is simple: agent outputs should not be trapped in chat history, screenshots, or local temp folders. They should become reproducible, inspectable, shareable artifacts with stable URLs and source-level transparency.
 
+Public repository: https://github.com/jbmcguire/PlayPen
+
+## Form Starter
+
+- Project name: PlayPen
+- Repository URL: https://github.com/jbmcguire/PlayPen
+- License: MIT
+- Category: agent tooling / developer infrastructure
+- Current status: working prototype / submission candidate
+- Primary audience: AI coding agents, developers, product/design reviewers, support, and QA teams
+- Demo assets: `PlayPen/Marketing/screenshots` and `PlayPen/Marketing/share`
+- Verification: hosted service check/test/smoke/demo pass locally; native app builds for iOS Simulator
+- Remaining public-host gate: deploy to an approved host and run production preflight with `--require-public --require-token`
+
 ## Why This Matters for Agent Workflows
 
 Codex-style workflows already produce useful intermediate products: visual QA pages, generated reports, dashboards, HTML prototypes, Markdown plans, review canvases, and implementation notes. Those outputs need a neutral artifact layer that supports:
