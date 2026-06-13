@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlayPen — Public-Release Readiness Findings</title>
+<style>
+  :root {
+    --clay:#D97757; --slate:#141413; --ivory:#FAF9F5; --gray:#6B6963;
+    --line:#E5E2DC; --card:#FFFFFF; --dim:#A8A49C;
+    --p1:#B3433B; --p1-bg:#F6E2E0;
+    --p2:#B07D2B; --p2-bg:#F6EDDA;
+    --p3:#3B7A57; --p3-bg:#E4EFE7;
+    --sec:#9A3F8F; --sec-bg:#F1E3EF;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, sans-serif;
+    color: var(--slate); background: var(--ivory);
+    margin: 0; padding: 40px clamp(18px, 5vw, 64px) 96px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; }
+  header .stamp { font-family: ui-monospace, monospace; font-size: 12px; color: var(--dim); letter-spacing: .03em; }
+  h1 { font-family: ui-serif, Georgia, serif; font-size: clamp(26px, 4vw, 33px); margin: 6px 0 4px; letter-spacing: -.01em; }
+  .lede { color: var(--gray); margin: 0 0 4px; max-width: 64ch; }
+
+  .summary { margin-top: 26px; background: var(--slate); color: var(--ivory); border-radius: 14px; padding: 18px 22px; }
+  .summary p { margin: 0; font-size: 14px; opacity: .92; max-width: 70ch; }
+  .summary b { color: #E8B4A0; font-weight: 600; }
+
+  .counts { display: grid; grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); gap: 12px; margin-top: 22px; }
+  .count { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .count .n { font-family: ui-serif, Georgia, serif; font-size: 28px; line-height: 1; }
+  .count .l { font-size: 12px; color: var(--gray); margin-top: 4px; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; margin: 30px 0 6px; }
+  .toolbar .label { font-size: 12px; color: var(--gray); font-family: ui-monospace, monospace; letter-spacing: .05em; text-transform: uppercase; margin-right: 4px; }
+  .chip {
+    font: inherit; font-size: 13px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--card); color: var(--slate);
+    border-radius: 999px; padding: 5px 13px; transition: background .15s ease-out, border-color .15s ease-out, color .15s ease-out;
+  }
+  .chip:hover { border-color: var(--clay); }
+  .chip[aria-pressed="true"] { background: var(--slate); color: var(--ivory); border-color: var(--slate); }
+  .chip:focus-visible { outline: 2px solid var(--clay); outline-offset: 2px; }
+
+  .list { margin-top: 18px; display: grid; gap: 14px; }
+  .finding { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; transition: opacity .2s ease-out; }
+  .finding .top { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .finding h3 { font-size: 16.5px; margin: 0; flex: 1 1 320px; line-height: 1.35; }
+  .tag { font-family: ui-monospace, monospace; font-size: 11px; font-weight: 600; letter-spacing: .04em; border-radius: 6px; padding: 3px 8px; white-space: nowrap; }
+  .tag.p1 { background: var(--p1-bg); color: var(--p1); }
+  .tag.p2 { background: var(--p2-bg); color: var(--p2); }
+  .tag.p3 { background: var(--p3-bg); color: var(--p3); }
+  .tag.cat { background: var(--sec-bg); color: var(--sec); }
+  .tag.plan { background: var(--ivory); color: var(--gray); border: 1px solid var(--line); }
+
+  .finding p.body { margin: 12px 0 0; color: #36352F; font-size: 14.5px; }
+  .ev { margin-top: 11px; font-family: ui-monospace, monospace; font-size: 12.5px; color: var(--gray); background: var(--ivory); border: 1px solid var(--line); border-radius: 8px; padding: 8px 11px; overflow-x: auto; }
+  .ev code { color: var(--clay); }
+  .meta { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; font-size: 12.5px; color: var(--gray); }
+  .meta span b { color: var(--slate); font-weight: 600; }
+
+  h2 { font-family: ui-serif, Georgia, serif; font-size: 19px; margin: 42px 0 6px; }
+  h2 .sub { font-family: ui-sans-serif, system-ui; font-size: 13px; color: var(--gray); font-weight: 400; margin-left: 8px; }
+  .muted-list { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 9px; }
+  .muted-list li { background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--dim); border-radius: 10px; padding: 11px 14px; font-size: 13.5px; color: #36352F; }
+  .muted-list.reject li { border-left-color: var(--p3); }
+  .muted-list li b { color: var(--slate); }
+  .muted-list li .why { color: var(--gray); }
+
+  footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--dim); font-family: ui-monospace, monospace; }
+  .empty { color: var(--gray); font-style: italic; padding: 24px 4px; display: none; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="stamp">PLAYPEN · PUBLIC-RELEASE AUDIT · 2026-06-12 · commit 5857287</div>
+    <h1>Public-Release Readiness Findings</h1>
+    <p class="lede">Read-only survey of the PlayPen repo ahead of public release on github.com/jbmcguire/PlayPen. Five planned findings, plus what was considered and set aside.</p>
+  </header>
+
+  <div class="summary">
+    <p><b>Verdict:</b> the repo is in good shape for release — zero-dependency hosted service with a real test suite, strict ID validation, defended path traversal, a sandboxed render route, and timing-safe token comparison. The items below are hardening and public-repo hygiene, <b>not</b> emergency fixes. Each has a self-contained plan under <code>plans/</code>.</p>
+  </div>
+
+  <div class="counts">
+    <div class="count"><div class="n">5</div><div class="l">planned findings</div></div>
+    <div class="count"><div class="n">3</div><div class="l">security</div></div>
+    <div class="count"><div class="n">1</div><div class="l">confirmed bug</div></div>
+    <div class="count"><div class="n">9</div><div class="l">considered &amp; cut</div></div>
+  </div>
+
+  <div class="toolbar" role="group" aria-label="Filter findings">
+    <span class="label">Filter</span>
+    <button class="chip" data-filter="all" aria-pressed="true">All</button>
+    <button class="chip" data-filter="security" aria-pressed="false">Security</button>
+    <button class="chip" data-filter="bug" aria-pressed="false">Bug</button>
+    <button class="chip" data-filter="dx" aria-pressed="false">DX / Docs</button>
+    <button class="chip" data-filter="p1" aria-pressed="false">P1 only</button>
+  </div>
+
+  <div class="list" id="list">
+
+    <article class="finding" data-cat="security" data-pri="p1">
+      <div class="top">
+        <h3>Confirm before <code>playpen://configure</code> changes the publish host</h3>
+        <span class="tag p1">P1</span><span class="tag cat">SECURITY</span><span class="tag plan">plan 001</span>
+      </div>
+      <p class="body">A crafted <code>playpen://configure?service=…</code> deep link silently overwrites the hosted-service URL every future publish/replace/delete is sent to — including the publish token — showing only an after-the-fact alert. A link from a webpage or chat message can reroute a user's artifacts and token to an attacker. Fix: stage the URL and require explicit confirmation showing the destination before persisting.</p>
+      <div class="ev">ContentView.swift:131 — <code>configureHostedService(from:)</code> writes the override with no confirmation</div>
+      <div class="meta"><span><b>Impact:</b> credential + artifact theft via phishing link</span><span><b>Effort:</b> S</span><span><b>Risk:</b> LOW</span><span><b>Confidence:</b> HIGH</span></div>
+    </article>
+
+    <article class="finding" data-cat="security" data-pri="p2">
+      <div class="top">
+        <h3>Restrict <code>playpen://import</code> to http(s) URLs</h3>
+        <span class="tag p2">P2</span><span class="tag cat">SECURITY</span><span class="tag plan">plan 002</span>
+      </div>
+      <p class="body">The import path hands the embedded <code>url</code> straight to the resolver with no scheme check. Today <code>resolve</code> rejects non-HTTP responses so <code>file:</code>/<code>data:</code> fail late — but relying on a downstream type check for a security boundary is fragile. Validate the scheme at the deep-link entry (defense-in-depth).</p>
+      <div class="ev">ContentView.swift:145 — <code>hostedURL(from:)</code> returns <code>URL(string:)</code> unchecked</div>
+      <div class="meta"><span><b>Impact:</b> latent local-file / data-URI import if resolver changes</span><span><b>Effort:</b> S</span><span><b>Risk:</b> LOW</span><span><b>Confidence:</b> HIGH</span></div>
+    </article>
+
+    <article class="finding" data-cat="security" data-pri="p2">
+      <div class="top">
+        <h3>Harden public-link derivation against Host-header injection</h3>
+        <span class="tag p2">P2</span><span class="tag cat">SECURITY</span><span class="tag plan">plan 003</span>
+      </div>
+      <p class="body">When <code>PLAYPEN_PUBLIC_BASE_URL</code> is unset, every public link is built from the client-controlled <code>x-forwarded-host</code> / <code>Host</code> header. Behind a permissive proxy an attacker can point those links at their own domain. Preflight only <em>warns</em>. Fix: validate the forwarded host and make <code>--require-public</code> require the env var.</p>
+      <div class="ev">server.js:657 — forwarded host trusted as-is · production-preflight.js:158 — warns, does not fail</div>
+      <div class="meta"><span><b>Impact:</b> cache-poisoning / wrong links in production</span><span><b>Effort:</b> S</span><span><b>Risk:</b> LOW</span><span><b>Confidence:</b> MED</span></div>
+    </article>
+
+    <article class="finding" data-cat="bug" data-pri="p2">
+      <div class="top">
+        <h3>Verifier digest diverges from server on whitespace-padded annotations</h3>
+        <span class="tag p2">P2</span><span class="tag cat">BUG · TECH-DEBT</span><span class="tag plan">plan 004</span>
+      </div>
+      <p class="body">The content digest is reimplemented in four places. Three trim the annotation before hashing; <code>verify-host.js</code> does not. A payload whose annotation has leading/trailing whitespace digests differently in the verifier than on the server — so the verifier can reject a correctly-published record. Fix the verifier, write a canonical spec, add a conformance test.</p>
+      <div class="ev">verify-host.js:663 pushes <code>payload.annotation</code> untrimmed vs. server.js:508 / inspect-link.js:311 / HostedPlaygroundService.swift:229 (all trim)</div>
+      <div class="meta"><span><b>Impact:</b> spurious verify failures; silent ETag drift</span><span><b>Effort:</b> M</span><span><b>Risk:</b> MED</span><span><b>Confidence:</b> HIGH</span></div>
+    </article>
+
+    <article class="finding" data-cat="dx" data-pri="p3">
+      <div class="top">
+        <h3>Add public-repo contributor scaffolding &amp; tidy internal docs</h3>
+        <span class="tag p3">P3</span><span class="tag cat">DX · DOCS</span><span class="tag plan">plan 005</span>
+      </div>
+      <p class="body"><code>.github/</code> has only <code>ci.yml</code> — no issue or PR templates, so reports arrive without environment details and PRs skip the verification reminders. <code>CONTRIBUTING.md</code> omits <code>doctor</code>/<code>verify</code>. Internal planning docs (<code>PLAN.md</code>, <code>OPENAI_SUBMISSION.md</code>) read as roadmap in the public root. Pure additive scaffolding, no code change.</p>
+      <div class="ev">.github/ — only workflows/ci.yml present (no ISSUE_TEMPLATE / PULL_REQUEST_TEMPLATE)</div>
+      <div class="meta"><span><b>Impact:</b> first impression + quality of inbound contributions</span><span><b>Effort:</b> S</span><span><b>Risk:</b> LOW</span><span><b>Confidence:</b> HIGH</span></div>
+    </article>
+
+  </div>
+  <p class="empty" id="empty">No findings match this filter.</p>
+
+  <h2>Considered &amp; rejected <span class="sub">recorded so they aren't re-audited</span></h2>
+  <ul class="muted-list reject">
+    <li><b>Missing <code>await</code> on S3 <code>deletePayload</code></b> — <span class="why">the await is present (storage.js:152/164); delete correctly returns <code>false</code> on a missing record. Subagent misread.</span></li>
+    <li><b>No SECURITY.md / CODE_OF_CONDUCT.md</b> — <span class="why">both already exist at the repo root.</span></li>
+    <li><b>Path traversal in storage / static serving</b> — <span class="why">IDs validated by <code>safeID</code> (<code>[A-Za-z0-9_-]{8,80}</code>); static serving uses <code>path.normalize</code> + <code>startsWith</code> guard + <code>.playpen-store</code> block. Defended.</span></li>
+    <li><b>S3 read-error response-body leak</b> — <span class="why">Node GC reclaims the small unconsumed body; not worth the churn.</span></li>
+    <li><b>No ESLint/Prettier/typecheck gate</b> — <span class="why">zero-dependency by deliberate design; a linter's dependency cost outweighs the benefit at this size.</span></li>
+    <li><b>Token-comparison length-timing leak (server.js:762)</b> — <span class="why">real but very low severity (leaks only token length, only when configured, behind network jitter). Fold into plan 003 if touching that file.</span></li>
+    <li><b>Markdown render unbounded by line count</b> — <span class="why">already bounded by the 2 MB publish cap; client-side in the viewer only.</span></li>
+    <li><b>S3 driver only tested against a hand-written fake</b> — <span class="why">a real MinIO/S3 test needs Docker in CI, conflicting with the simple-CI posture. Revisit before the first production S3 deploy.</span></li>
+    <li><b>No native Swift test target</b> — <span class="why">deliberately deferred per PLAN.md phasing; L-effort new target. Plans 001/002/004 note where tests slot in if one is added.</span></li>
+  </ul>
+
+  <h2>Direction <span class="sub">not planned — maintainer's call</span></h2>
+  <ul class="muted-list">
+    <li><b>MCP server</b> wrapping the existing OpenAPI — <span class="why">the project's whole pitch is "agents publish artifacts here" (AGENTS.md), yet there's no MCP entry point. Strongest-grounded option.</span></li>
+    <li><b><code>npx playpen publish</code></b> — <span class="why">publish-file.js is already standalone; packaging removes the "clone the repo to publish" barrier for agents in sandboxes.</span></li>
+    <li><b>GitHub Action</b> to publish an artifact and comment the link on a PR — <span class="why">fits the stated QA/review audience; ci.yml already exercises the service but nothing consumes it.</span></li>
+  </ul>
+
+  <footer>5 planned findings · 0 secrets reproduced · advisor read-only — plans under plans/ are executable handoffs</footer>
+</div>
+
+<script>
+  const chips = Array.from(document.querySelectorAll('.chip'));
+  const findings = Array.from(document.querySelectorAll('.finding'));
+  const empty = document.getElementById('empty');
+
+  function apply(filter) {
+    let shown = 0;
+    findings.forEach(card => {
+      const cat = card.dataset.cat;
+      const pri = card.dataset.pri;
+      const match = filter === 'all'
+        || filter === cat
+        || (filter === 'p1' && pri === 'p1');
+      card.style.display = match ? '' : 'none';
+      if (match) shown++;
+    });
+    empty.style.display = shown ? 'none' : 'block';
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(other => other.setAttribute('aria-pressed', other === chip ? 'true' : 'false'));
+      apply(chip.dataset.filter);
+    });
+  });
+</script>
+</body>
+</html>

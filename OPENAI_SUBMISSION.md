@@ -6,6 +6,8 @@ PlayPen is open-source infrastructure for AI-generated artifacts. It lets agents
 
 The core idea is simple: agent outputs should not be trapped in chat history, screenshots, or local temp folders. They should become reproducible, inspectable, shareable artifacts with stable URLs and source-level transparency.
 
+PlayPen keeps context explicit through annotations, tags, metadata, manifests, and source links instead of device location or map surfaces.
+
 Public repository: https://github.com/jbmcguire/PlayPen
 
 ## Form Starter
@@ -27,6 +29,7 @@ Codex-style workflows already produce useful intermediate products: visual QA pa
 - durable links agents and users can both open
 - raw source inspection without scraping rendered pages
 - metadata and content digests for verification
+- annotations for provenance, review context, and agent handoff notes
 - CLI publishing from local workspaces
 - OpenAPI discovery for generated clients
 - verifier/preflight tooling before a host is trusted
@@ -39,6 +42,7 @@ PlayPen provides that layer while keeping the native app as the local mirror/edi
 - Static hosted mirror links with `#playground=` fallback payloads
 - Node hosted API with short `/p/:id` links
 - Markdown and sandboxed HTML rendering
+- Annotation-based context across native, hosted, CLI, metadata, and manifest flows
 - Public read, metadata, manifest, source, stats, capabilities, OpenAPI, and hosted index routes
 - Token-protected publish, replace, and delete routes
 - Filesystem storage by default

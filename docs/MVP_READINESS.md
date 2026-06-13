@@ -36,7 +36,7 @@ native app.
 | Native app mirrors the hosted service | `HostedPlaygroundService.swift`, hosted library/settings views, deep-link handlers, iOS simulator build | Verified locally |
 | Native imports preserve the shareable hosted link | API record/meta/manifest/source imports canonicalize back to `/p/:id` before storing local mirror metadata | Verified locally |
 | Static fallback imports are not treated as mutable API records | Native publish only uses `PUT` for API-backed hosted URLs; static snapshots publish as new API creates when a service is configured or remain static fallback | Verified locally |
-| Location sharing is removed; annotations carry context instead | Deleted location/map sources, annotation fields in model/native/hosted payloads | Verified locally |
+| Location sharing is removed; annotations carry context instead | No geotag/map sources or screenshot assets; annotation fields in model/native/hosted payloads | Verified locally |
 | Open-source hygiene is present | `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.gitignore`, `.env.example` | Present |
 | Submission narrative positions PlayPen as agent infrastructure | `OPENAI_SUBMISSION.md`, top-level `README.md`, `PRODUCT.md` | Present |
 | CI checks hosted service realistically | `.github/workflows/ci.yml` runs check, doctor, tests, smoke, and demo on Node 22 | Present |

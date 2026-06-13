@@ -10,7 +10,7 @@ AI agents and humans often produce useful artifacts that disappear into chat tra
 - the native app can import, edit, sync, and republish the hosted record
 - deployment tooling can verify a host before anyone trusts its links
 
-The native app is intentionally becoming the local mirror/editor for the hosted service, not the only place a playground can live.
+The native app is intentionally becoming the local mirror/editor for the hosted service, not the only home for a playground.
 
 ## Status
 
@@ -25,6 +25,7 @@ Working now:
 
 - Native SwiftUI app for macOS and iPadOS 27 targets
 - Markdown and HTML playground editing/preview
+- Annotation-based context for provenance, review notes, and agent handoffs
 - Hosted mirror metadata on local playgrounds
 - `playpen://import` and `playpen://configure` deep links
 - Hosted library browser in the native app

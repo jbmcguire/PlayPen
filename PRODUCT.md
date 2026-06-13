@@ -10,6 +10,8 @@ PlayPen's marketing page is for Mac and iPad users who collect code experiments,
 ## Product Purpose
 PlayPen gives rough technical notes a focused native workspace: source editing, rendered preview, projects, tags, outline navigation, search, annotations, and hosted mirror links for sharing HTML or Markdown playgrounds outside the app. The marketing site should make the app feel quick to understand, trustworthy, and worth trying because it shows real product behavior instead of an invented dashboard.
 
+The MVP does not include geotagging or map views. Context should travel through lightweight annotations, tags, projects, outlines, and hosted metadata.
+
 ## Brand Personality
 Native, clean, quick. The page should feel precise, calm, and confident, closer to a top-tier Apple, Google, or Linear product launch than a generic SaaS landing page.
 

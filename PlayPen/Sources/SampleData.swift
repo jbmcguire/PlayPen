@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 
 enum SampleData {
-    private static let hasSeededKey = "SampleData.hasSeeded.v3"
+    private static let hasSeededKey = "SampleData.hasSeeded.v4"
 
     static func seedIfNeeded(context: ModelContext) {
         guard !UserDefaults.standard.bool(forKey: hasSeededKey) else { return }
@@ -17,12 +17,12 @@ enum SampleData {
         swiftUIProject.sortIndex = 0
         let apiProject = Project(name: "API Spikes")
         apiProject.sortIndex = 1
-        let fieldNotesProject = Project(name: "Field Notes")
-        fieldNotesProject.sortIndex = 2
+        let reviewNotesProject = Project(name: "Review Notes")
+        reviewNotesProject.sortIndex = 2
         let webClipsProject = Project(name: "Web Clips")
         webClipsProject.sortIndex = 3
 
-        [swiftUIProject, apiProject, fieldNotesProject, webClipsProject].forEach { context.insert($0) }
+        [swiftUIProject, apiProject, reviewNotesProject, webClipsProject].forEach { context.insert($0) }
 
         let swiftTag = Tag(name: "swift")
         let uiTag = Tag(name: "ui")
@@ -76,7 +76,7 @@ enum SampleData {
 
             - Surface the final error inline, not in a sheet
             - Log exhausted retries with request family and endpoint
-            - Re-test on the coffee shop network before shipping
+            - Re-test under constrained network conditions before shipping
             """,
             project: apiProject,
             tags: [swiftTag, networkingTag, reliabilityTag],
@@ -89,7 +89,7 @@ enum SampleData {
             content: """
             # Offline Save Queue
 
-            Notes from testing edits during a subway ride. The editor should keep accepting input even while sync is parked.
+            Notes from testing edits during an offline QA session. The editor should keep accepting input even while sync is parked.
 
             ## Queue shape
 
@@ -226,7 +226,7 @@ enum SampleData {
 
             Good examples: "Generated during visual QA", "Needs security review", "Imported from a support repro".
             """,
-            project: fieldNotesProject,
+            project: reviewNotesProject,
             tags: [polishTag, ideaTag],
             minutesAgo: 93,
             annotation: "Use annotations for provenance or review notes.",
@@ -234,11 +234,11 @@ enum SampleData {
         )
 
         addPlayground(
-            title: "Coffee Shop Latency",
+            title: "Weak Wi-Fi Latency",
             content: """
-            # Coffee Shop Latency
+            # Weak Wi-Fi Latency
 
-            Captured while pairing on weak Wi-Fi. Useful repro for slow sync and preview refresh.
+            Captured during manual QA on weak Wi-Fi. Useful repro for slow sync and preview refresh.
 
             ```text
             average ping: 180ms
@@ -248,7 +248,7 @@ enum SampleData {
 
             Keep this around for offline save queue testing.
             """,
-            project: fieldNotesProject,
+            project: reviewNotesProject,
             tags: [networkingTag, reliabilityTag],
             minutesAgo: 117,
             annotation: "Weak network repro captured during manual QA.",
@@ -281,7 +281,7 @@ enum SampleData {
 
             Candidate language for the marketing page.
 
-            > A native place for rough notes to become useful again.
+            > A native workspace for rough notes to become useful again.
 
             Stronger than "knowledge base" because the product is lighter than that. The promise is speed, trust, and finding the useful bit later.
 
